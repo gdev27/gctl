@@ -2,6 +2,8 @@
 
 Institutional Policy OS is a hackathon-ready TypeScript + Hardhat project for policy-constrained autonomous execution.
 
+Built by Gaurav Dev.
+
 ## Track strategy
 - Primary target: KeeperHub - Best Use of KeeperHub.
 - Secondary target: ENS - Best ENS Integration for AI Agents.
