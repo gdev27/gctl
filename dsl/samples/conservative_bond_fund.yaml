@@ -1,0 +1,33 @@
+id: conservative-bond-fund
+version: 1.0.0
+schema_version: 1.0.0
+jurisdiction: EU
+regulation: MiCA + MiFID II RTS 6
+assets:
+  base: BONDRWA
+  settle_tokens:
+    - EURC
+privacy:
+  large_trade_threshold: 75000
+  large_trade_route: shielded
+routing:
+  routing_threshold: 75000
+  small_trade_route: cowswap
+  large_trade_route: private-mempool
+  allowed_dexes:
+    - COWSWAP
+limits:
+  max_trade_value: 200000
+  max_daily_notional: 600000
+  max_single_trade: 200000
+reporting:
+  enabled: true
+  regulator_endpoint: https://regulator.example/api/reports
+  report_on:
+    - large_trades
+  fields:
+    - amount
+    - policyId
+    - timestamp
+controls:
+  kill_switch_enabled: true

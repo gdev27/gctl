@@ -1,0 +1,38 @@
+id: eurofund-mica
+version: 1.0.0
+schema_version: 1.0.0
+jurisdiction: EU
+regulation: MiCA + MiFID II RTS 6
+assets:
+  base: EURRWA
+  settle_tokens:
+    - EURC
+    - USDC
+privacy:
+  large_trade_threshold: 100000
+  large_trade_route: private-mempool
+routing:
+  routing_threshold: 100000
+  small_trade_route: cowswap
+  large_trade_route: flashbots
+  allowed_dexes:
+    - COWSWAP
+    - UNISWAP_V4
+limits:
+  max_trade_value: 500000
+  max_daily_notional: 2000000
+  max_single_trade: 500000
+reporting:
+  enabled: true
+  regulator_endpoint: https://regulator.example/api/reports
+  report_on:
+    - large_trades
+    - limits_breached
+  fields:
+    - assetIn
+    - assetOut
+    - amount
+    - policyId
+    - timestamp
+controls:
+  kill_switch_enabled: false

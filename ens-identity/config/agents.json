@@ -1,0 +1,10 @@
+{
+  "fundEnsName": "eurofund.eth",
+  "agentEnsName": "algo1.eurofund.eth",
+  "policyId": "eurofund-mica",
+  "policyRegistryAddress": "",
+  "policyRegistryChainId": 84532,
+  "executionProfile": "standard",
+  "agentRegistryAddress": "",
+  "agentId": "1"
+}

@@ -1,0 +1,27 @@
+{
+  "name": "large-trade-flashbots",
+  "steps": [
+    {
+      "type": "flashbots_bundle",
+      "params": {
+        "assetIn": "<assetIn>",
+        "assetOut": "<assetOut>",
+        "amount": "<amount>",
+        "targetContract": "<router>"
+      }
+    },
+    {
+      "type": "http_post",
+      "params": {
+        "url": "<regulatorEndpoint>",
+        "body": {
+          "assetIn": "<assetIn>",
+          "assetOut": "<assetOut>",
+          "amount": "<amount>",
+          "policyId": "<policyId>",
+          "timestamp": "<timestamp>"
+        }
+      }
+    }
+  ]
+}

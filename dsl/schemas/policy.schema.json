@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://institutional-policy-os/policy.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "version",
+    "schema_version",
+    "jurisdiction",
+    "regulation",
+    "assets",
+    "privacy",
+    "routing",
+    "limits",
+    "reporting",
+    "controls"
+  ],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+    "schema_version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$", "const": "1.0.0" },
+    "jurisdiction": { "type": "string", "minLength": 1 },
+    "regulation": { "type": "string", "minLength": 1 },
+    "assets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base", "settle_tokens"],
+      "properties": {
+        "base": { "type": "string", "minLength": 1 },
+        "settle_tokens": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["large_trade_threshold", "large_trade_route"],
+      "properties": {
+        "large_trade_threshold": { "type": "number", "exclusiveMinimum": 0 },
+        "large_trade_route": {
+          "type": "string",
+          "enum": ["public", "shielded", "private-mempool"]
+        }
+      }
+    },
+    "routing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["routing_threshold", "small_trade_route", "large_trade_route", "allowed_dexes"],
+      "properties": {
+        "routing_threshold": { "type": "number", "exclusiveMinimum": 0 },
+        "small_trade_route": { "type": "string", "enum": ["cowswap", "uniswap-v4"] },
+        "large_trade_route": { "type": "string", "enum": ["flashbots", "private-mempool"] },
+        "allowed_dexes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_trade_value", "max_daily_notional", "max_single_trade"],
+      "properties": {
+        "max_trade_value": { "type": "number", "exclusiveMinimum": 0 },
+        "max_daily_notional": { "type": "number", "exclusiveMinimum": 0 },
+        "max_single_trade": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "reporting": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "regulator_endpoint", "report_on", "fields"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "regulator_endpoint": { "type": "string", "format": "uri-reference" },
+        "report_on": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["large_trades", "limits_breached"] },
+          "uniqueItems": true
+        },
+        "fields": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      }
+    },
+    "controls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kill_switch_enabled"],
+      "properties": {
+        "kill_switch_enabled": { "type": "boolean" }
+      }
+    }
+  }
+}

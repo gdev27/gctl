@@ -1,0 +1,13 @@
+{
+  "name": "small-trade-cowswap",
+  "steps": [
+    {
+      "type": "cowswap_intent",
+      "params": {
+        "assetIn": "<assetIn>",
+        "assetOut": "<assetOut>",
+        "amount": "<amount>"
+      }
+    }
+  ]
+}

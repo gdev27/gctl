@@ -1,0 +1,13 @@
+{
+  "name": "large-trade-public",
+  "steps": [
+    {
+      "type": "public_router_swap",
+      "params": {
+        "assetIn": "<assetIn>",
+        "assetOut": "<assetOut>",
+        "amount": "<amount>"
+      }
+    }
+  ]
+}
