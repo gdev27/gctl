@@ -22,5 +22,7 @@ describe("workflow reconciliation", () => {
     });
     expect(result.state).toBe("succeeded");
     expect(result.auditPath).toContain(run.runId);
+    expect(result.logCount).toBeGreaterThan(0);
+    expect(result.analytics?.successRate).toBeTypeOf("number");
   });
 });
