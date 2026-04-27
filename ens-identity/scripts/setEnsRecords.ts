@@ -16,6 +16,16 @@ type AgentConfig = {
   executionProfile?: "standard" | "private-only";
   agentRegistryAddress: string;
   agentId: string;
+  roleAgents?: Array<{
+    ensName: string;
+    role: "planner" | "researcher" | "critic" | "executor";
+    agentId: string;
+    capabilities: string[];
+    description?: string;
+    endpoint?: string;
+    version?: string;
+    policyProfile?: string;
+  }>;
 };
 
 async function setText(
@@ -76,6 +86,57 @@ async function main() {
     `agent-registration[${config.agentRegistryAddress || "erc8004"}][agentId]`,
     config.agentId
   );
+  await setText(agentResolverAddress, signer, config.agentEnsName, "agent-role", "executor");
+  await setText(
+    agentResolverAddress,
+    signer,
+    config.agentEnsName,
+    "agent-capabilities",
+    "execution,policy-routing,reconciliation"
+  );
+  await setText(
+    agentResolverAddress,
+    signer,
+    config.agentEnsName,
+    "agent-description",
+    "Institutional execution agent with policy fail-closed routing."
+  );
+  await setText(agentResolverAddress, signer, config.agentEnsName, "agent-version", "v2");
+  await setText(agentResolverAddress, signer, config.agentEnsName, "agent-policy-profile", config.policyId);
+
+  if (Array.isArray(config.roleAgents)) {
+    for (const roleAgent of config.roleAgents) {
+      await setText(
+        agentResolverAddress,
+        signer,
+        roleAgent.ensName,
+        `agent-registration[${config.agentRegistryAddress || "erc8004"}][agentId]`,
+        roleAgent.agentId
+      );
+      await setText(agentResolverAddress, signer, roleAgent.ensName, "agent-role", roleAgent.role);
+      await setText(
+        agentResolverAddress,
+        signer,
+        roleAgent.ensName,
+        "agent-capabilities",
+        roleAgent.capabilities.join(",")
+      );
+      if (roleAgent.description) {
+        await setText(agentResolverAddress, signer, roleAgent.ensName, "agent-description", roleAgent.description);
+      }
+      if (roleAgent.endpoint) {
+        await setText(agentResolverAddress, signer, roleAgent.ensName, "agent-endpoint", roleAgent.endpoint);
+      }
+      await setText(agentResolverAddress, signer, roleAgent.ensName, "agent-version", roleAgent.version || "v2");
+      await setText(
+        agentResolverAddress,
+        signer,
+        roleAgent.ensName,
+        "agent-policy-profile",
+        roleAgent.policyProfile || config.policyId
+      );
+    }
+  }
 
   console.log(
     JSON.stringify(

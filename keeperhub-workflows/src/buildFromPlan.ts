@@ -24,12 +24,13 @@ export function buildWorkflowFromPlan(
     workflowRef: randomUUID(),
     policyId: context.policyId,
     route: plan.route,
-    pathType: plan.pathType
+    pathType: plan.pathType,
+    policyPath: plan.pathType === "batch-auction" ? "safe-path" : "escalated-path"
   };
 
   if (plan.pathType === "batch-auction") {
     return {
-      name: "small-trade-cowswap",
+      name: "safe-path-small-trade",
       metadata: baseMetadata,
       steps: [
         {
@@ -73,7 +74,7 @@ export function buildWorkflowFromPlan(
   }
 
   return {
-    name: "large-trade-flashbots",
+    name: "escalated-path-large-trade",
     metadata: baseMetadata,
     steps
   };

@@ -18,7 +18,17 @@ export type ReconcileInput = {
 export async function reconcileWorkflow(
   client: KeeperHubClient,
   input: ReconcileInput
-): Promise<{ state: WorkflowTerminalState; auditPath: string }> {
+): Promise<{
+  state: WorkflowTerminalState;
+  auditPath: string;
+  logCount: number;
+  analytics?: {
+    successRate?: number;
+    avgExecutionTimeMs?: number;
+    failedRuns?: number;
+    totalGasUsedWei?: string;
+  };
+}> {
   const maxPolls = input.maxPolls ?? 20;
   const pollIntervalMs = input.pollIntervalMs ?? 1000;
 
@@ -66,6 +76,8 @@ export async function reconcileWorkflow(
   );
 
   const auditPath = path.resolve(logDir, `${input.runId}.json`);
+  const executionLogs = client.getExecutionLogs ? await client.getExecutionLogs(input.runId) : { events: [] };
+  const analytics = client.getAnalytics ? await client.getAnalytics() : undefined;
   await fs.writeFile(auditPath, JSON.stringify(redacted, null, 2), "utf8");
-  return { state: finalState, auditPath };
+  return { state: finalState, auditPath, logCount: executionLogs.events.length, analytics };
 }

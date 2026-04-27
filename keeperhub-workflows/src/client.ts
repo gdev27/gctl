@@ -6,6 +6,13 @@ export interface KeeperHubClient {
   createWorkflow(workflow: KeeperHubWorkflow): Promise<{ workflowId: string }>;
   runWorkflow(workflowId: string): Promise<{ runId: string }>;
   getWorkflowStatus(runId: string): Promise<{ state: WorkflowTerminalState; raw: unknown }>;
+  getExecutionLogs?(runId: string): Promise<{ events: Array<Record<string, unknown>> }>;
+  getAnalytics?(): Promise<{
+    successRate?: number;
+    avgExecutionTimeMs?: number;
+    failedRuns?: number;
+    totalGasUsedWei?: string;
+  }>;
 }
 
 export class HttpKeeperHubClient implements KeeperHubClient {
@@ -41,5 +48,23 @@ export class HttpKeeperHubClient implements KeeperHubClient {
 
   async getWorkflowStatus(runId: string): Promise<{ state: WorkflowTerminalState; raw: unknown }> {
     return this.request<{ state: WorkflowTerminalState; raw: unknown }>(`/runs/${runId}`, { method: "GET" });
+  }
+
+  async getExecutionLogs(runId: string): Promise<{ events: Array<Record<string, unknown>> }> {
+    return this.request<{ events: Array<Record<string, unknown>> }>(`/runs/${runId}/logs`, { method: "GET" });
+  }
+
+  async getAnalytics(): Promise<{
+    successRate?: number;
+    avgExecutionTimeMs?: number;
+    failedRuns?: number;
+    totalGasUsedWei?: string;
+  }> {
+    return this.request<{
+      successRate?: number;
+      avgExecutionTimeMs?: number;
+      failedRuns?: number;
+      totalGasUsedWei?: string;
+    }>(`/analytics/summary`, { method: "GET" });
   }
 }
