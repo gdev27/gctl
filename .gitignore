@@ -8,3 +8,6 @@ typechain-types
 *.tsbuildinfo
 policy-storage
 reconciliation-logs
+.cursor
+.claude
+indexer/index-state.json
