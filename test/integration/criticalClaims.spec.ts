@@ -95,6 +95,15 @@ describe("critical claims", () => {
       executionProfile: "private-only"
     });
     vi.spyOn(MainnetEnsResolver.prototype, "verifyAgentAuthorization").mockResolvedValue(true);
+    vi.spyOn(MainnetEnsResolver.prototype, "resolveIdentityPassport").mockResolvedValue({
+      ensName: "algo1.eurofund.eth",
+      walletAddress: "0x0000000000000000000000000000000000000001",
+      resolverAddress: "0x0000000000000000000000000000000000000002",
+      verifiedReverse: true,
+      role: "executor",
+      capabilities: ["execution"],
+      metadata: {}
+    });
     vi.spyOn(EvmPolicyRegistryReader.prototype, "getPolicyMeta").mockResolvedValue({
       hash: policyHash,
       uri: "file://policy",
