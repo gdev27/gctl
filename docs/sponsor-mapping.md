@@ -1,28 +1,36 @@
 # Sponsor Feature Mapping
 
-## KeeperHub (Primary Track)
-- **Meaningful integration depth**
-  - Workflow construction from policy decisions in `keeperhub-workflows/src/buildFromPlan.ts`.
-  - Execution client abstraction (real HTTP client + deterministic mock) in `keeperhub-workflows/src/client.ts` and `keeperhub-workflows/src/client.mock.ts`.
-  - Reconciliation with terminal states + persisted audit artifacts in `keeperhub-workflows/src/reconcile.ts`.
-- **Utility**
-  - Handles execution reliability concerns (status polling, terminal state normalization, audit trail generation).
-- **Mergeable quality**
-  - Tested behavior in `test/reconcile.test.ts` and `test/integration/criticalClaims.spec.ts`.
+## 0G (Framework + Autonomous Agents)
+- **0G Storage (meaningful use)**
+  - Persistent memory and execution artifacts via storage adapter interface in `policy-engine/src/storageAdapter.ts` and `agent-sdk/src/adapters.ts`.
+  - 0G-specific adapter implementation in `agent-sdk/src/zeroG.ts`.
+- **0G Compute (meaningful use)**
+  - Planner/critic reflection and provider metadata capture in `agent-sdk/src/zeroG.ts`.
+  - Swarm reasoning loop in `examples/treasuryTwinSwarm.ts`.
+- **0G Chain (meaningful use)**
+  - Policy and execution anchoring through `contracts/PolicyRegistry.sol` and attestation writer flow in `agent-sdk/src/zeroG.ts`.
+- **Framework-level depth**
+  - Adapter contracts, extension points, and CLI-ready patterns in `docs/adapter-contracts.md`, `docs/extension-cookbook.md`.
 
-## ENS (Secondary Track)
-- **Non-cosmetic identity usage**
-  - Runtime policy discovery from ENS text records (`policy-id`, `policy-registry`, `policy-registry-chain-id`) in `agent-sdk/src/ensResolver.ts`.
-  - Agent authorization check via ENS agent-registration record.
-  - ENS `execution-profile` text record directly alters runtime routing behavior (`standard` vs `private-only`) in `agent-sdk/src/client.ts`.
-- **Functional demo evidence**
-  - ENS records are written by `ens-identity/scripts/setEnsRecords.ts`.
-  - Demo path consumes those records in policy planning (`scripts/demoDeterministic.ts`).
+## ENS (Identity + Creative Use)
+- **Identity as infrastructure**
+  - ENS policy discovery and authorization in `agent-sdk/src/ensResolver.ts`.
+  - Reverse-check verification and identity passport generation in `agent-sdk/src/ensResolver.ts`.
+- **Subname and role model**
+  - Role-bound identity records (`planner`, `researcher`, `critic`, `executor`) configured by `ens-identity/scripts/setEnsRecords.ts`.
+- **Discoverability**
+  - Identity profile metadata consumed by swarm and exposed in demo output via `examples/treasuryTwinSwarm.ts`.
 
-## Open Agents Judging Criteria Mapping
-- **Technical depth**
-  - On-chain anchoring + off-chain deterministic policy engine + execution reconciliation.
-- **Originality**
-  - Institutional policy OS pattern for agentic execution with fail-closed controls.
-- **Ecosystem impact**
-  - Reusable architecture: policy DSL, planning SDK, and execution adapter patterns.
+## KeeperHub (Execution + Reliability)
+- **Execution reliability**
+  - Policy-to-workflow branching in `keeperhub-workflows/src/buildFromPlan.ts`.
+  - Runtime execution and reconciliation in `keeperhub-workflows/src/runDemo.ts` and `keeperhub-workflows/src/reconcile.ts`.
+- **Evidence and observability**
+  - Terminal state normalization, encrypted audit logs, and analytics summary in `keeperhub-workflows/src/reconcile.ts`.
+- **Integration quality**
+  - Mock and HTTP clients, integration tests, and failure injection in `keeperhub-workflows/src/client.ts`, `keeperhub-workflows/src/client.mock.ts`, and `test/`.
+
+## Judging Criteria Mapping
+- **Utility over novelty:** autonomous actions are policy-bound and operationally reliable.
+- **Technical depth:** combines identity, verifiable inference hooks, and audited execution.
+- **Mergeable quality:** adapter boundaries, tests, runbooks, and open extension documentation.

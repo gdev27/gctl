@@ -1,23 +1,23 @@
-# Win Scope Freeze
+# Win Scope Freeze (v2)
 
-This file freezes the judging-focused scope so the team can ship reliably before deadline.
+This scope freeze locks the highest-impact build that can win across 0G, ENS, and KeeperHub while staying demo-reliable.
 
-## Primary and secondary tracks
-- Primary: KeeperHub - Best Use of KeeperHub.
-- Secondary: ENS - Best ENS Integration for AI Agents.
-- Optional stretch: 0G integration only if core demo is stable and fully tested.
+## Unified track strategy
+- **0G Framework + Tooling:** `PolicyGraph SDK` core adapters and extension points.
+- **0G Autonomous Agents + Swarms:** `TreasuryTwin Swarm` reference system.
+- **ENS:** identity passport, role subnames, resolver-backed authorization.
+- **KeeperHub:** execution reliability with branch routing, logs, and analytics.
 
-## Demo-critical scope (must ship)
-- Deterministic policy compiler + engine that creates different plans for small vs large trades.
-- Intent and identity checks through ENS metadata + agent authorization record.
-- On-chain policy hash anchoring via `PolicyRegistry`.
-- KeeperHub workflow mapping + execution + reconciliation terminal states.
-- Redacted/encrypted audit artifact output.
-- End-to-end demo scripts with reproducible JSON outputs.
+## Must-ship outcomes
+- Deterministic policy compiler + evaluator with reproducible traces.
+- Stable adapter interfaces for `0g`, `ens`, and `keeperhub`.
+- 0G-backed memory and attestation hooks in live end-to-end path.
+- ENS-based policy discovery, reverse verification, and role identity metadata.
+- KeeperHub execution branching (`safe-path`, `escalated-path`, `blocked-path`) with reconciliation evidence.
+- Four-role swarm demo (planner, researcher, critic, executor) using shared memory.
+- Reliability tests and failure-injection scenarios with measurable KPIs.
 
-## Backlog (explicitly parked)
-- TEE/ZK proof generation (keep hook points only).
-- Full production indexer pipeline (current local index state is sufficient for demo).
-- Multi-chain registry deployment automation beyond Base Sepolia.
-- No-code UI for policy authoring.
-- Expanded protocol connectors beyond current two-route flow.
+## Stretch scope (only after must-ship)
+- iNFT ERC-7857 ownership layer for transferable agents.
+- Live paid workflow monetization in production mode (x402/MPP).
+- Full indexer deployment pipeline and public dashboard hosting.

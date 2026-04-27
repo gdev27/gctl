@@ -2,31 +2,41 @@
 
 ```mermaid
 flowchart LR
-  compliance["ComplianceYAML"] --> dslValidator["DSLValidator"]
-  dslValidator --> compiler["PolicyCompiler"]
-  compiler --> storage["PolicyStorageAdapter"]
-  compiler --> policyRegistry["PolicyRegistry(L2)"]
-  guardian["GuardianMultisig"] --> policyRegistry
+  PolicyAuthor[PolicyAuthor] --> DSL[PolicyDSL]
+  DSL --> Compiler[DeterministicCompiler]
+  Compiler --> PolicyRegistry[PolicyRegistryOnchain]
+  Compiler --> StorageAdapter[PolicyStorageAdapter]
 
-  agent["Agent"] --> policyClient["PolicyClientSDK"]
-  policyClient --> ens["ENSResolver(Mainnet)"]
-  ens --> policyRegistry
-  policyClient --> storage
-  policyClient --> engine["PolicyEngine"]
-  engine --> plan["ExecutionPlan"]
+  UserOrDAO[UserOrDAO] --> PolicyClient[PolicyClientSDK]
+  PolicyClient --> ENSResolver[ENSResolver]
+  ENSResolver --> IdentityPassport[IdentityPassport]
+  PolicyClient --> Engine[PolicyEngine]
+  PolicyClient --> StorageAdapter
+  Engine --> Decision[ExecutionPlan]
 
-  plan --> workflows["KeeperHubWorkflowBuilder"]
-  workflows --> keeperhub["KeeperHub"]
-  keeperhub --> reconcile["Reconciliation"]
-  reconcile --> privacy["Redact+Encrypt Audit"]
-  privacy --> logs["Audit Logs"]
-  policyRegistry --> indexer["Indexer"]
-  reconcile --> indexer
-  indexer --> api["Compliance API"]
+  Decision --> WorkflowRouter[KeeperHubWorkflowRouter]
+  WorkflowRouter --> KeeperHubExec[KeeperHubExecution]
+  KeeperHubExec --> Reconcile[ReconciliationAndAnalytics]
+  Reconcile --> AuditLogs[EncryptedAuditLogs]
+
+  PolicyClient --> ZeroGCompute[0GComputeAdapter]
+  PolicyClient --> ZeroGMemory[0GStorageMemory]
+  Reconcile --> ZeroGMemory
+  Reconcile --> ZeroGChain[0GChainAttestation]
+
+  SwarmPlanner[PlannerAgent] --> ZeroGCompute
+  SwarmResearcher[ResearcherAgent] --> ZeroGCompute
+  SwarmCritic[CriticAgent] --> ZeroGCompute
+  SwarmExecutor[ExecutorAgent] --> WorkflowRouter
+  ZeroGMemory --> OpsUI[OpsDashboard]
+  IdentityPassport --> OpsUI
+  ZeroGChain --> OpsUI
+  AuditLogs --> OpsUI
 ```
 
 ## Trust boundaries
-- **Mainnet ENS** is source of policy discovery and agent authorization metadata.
-- **L2 PolicyRegistry** anchors policy hash + active state for cheaper policy updates.
-- **Storage adapter** stores full policy graph and must match on-chain hash.
-- **PolicyClient** is fail-closed: dependency failure always produces deny.
+- **Mainnet ENS** provides identity, role metadata, and authorization attestations.
+- **PolicyRegistry** anchors canonical policy hashes and active status.
+- **0G Storage memory** persists encrypted swarm context and execution artifacts.
+- **KeeperHub** executes policy-approved actions with run-level observability.
+- **PolicyClient is fail-closed**: dependency or verification failures default to deny.
