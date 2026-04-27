@@ -122,6 +122,7 @@ export class PolicyClient {
       const ensProvider = this.getEnsProvider();
       const resolver = new MainnetEnsResolver(ensProvider, this.opts.agentRegistryAddress);
       const metadata = await this.retry(() => resolver.resolveFundMetadata(input.fundEnsName));
+      let identityPassport;
 
       if (metadata.policyRegistryChainId !== this.opts.expectedRegistryChainId) {
         return failClosed("ENS_RECORD_MALFORMED", "registry_chain_mismatch");
@@ -132,6 +133,7 @@ export class PolicyClient {
         if (!authorized) {
           return failClosed("AGENT_NOT_AUTHORIZED", input.callerEnsName);
         }
+        identityPassport = await this.retry(() => resolver.resolveIdentityPassport(input.callerEnsName as string));
       }
 
       const l2Provider = this.getL2Provider();
@@ -173,6 +175,7 @@ export class PolicyClient {
       return {
         policyId: metadata.policyId,
         metadata,
+        identityPassport,
         plan
       };
     } catch (error) {

@@ -8,12 +8,40 @@ import { HttpKeeperHubClient } from "./client";
 import { MockKeeperHubClient } from "./client.mock";
 import { reconcileWorkflow } from "./reconcile";
 import { indexWorkflowOutcome } from "../../indexer/src/reconciliation";
+import { ZeroGChainAdapter, ZeroGComputeAdapter, ZeroGMemoryAdapter } from "../../agent-sdk/src/zeroG";
 
 export async function runPolicyAndWorkflow(input: {
   fundEnsName: string;
   callerEnsName?: string;
   action: ActionRequest;
 }): Promise<Record<string, unknown>> {
+  const computeAdapter = new ZeroGComputeAdapter();
+  const memoryAdapter = new ZeroGMemoryAdapter();
+  const chainAdapter = new ZeroGChainAdapter();
+
+  const preflight = await computeAdapter.infer({
+    role: "planner",
+    objective: "Assess execution risk and preferred route for this action",
+    context: {
+      fundEnsName: input.fundEnsName,
+      callerEnsName: input.callerEnsName || null,
+      action: input.action
+    }
+  });
+
+  const preflightMemory = await memoryAdapter.write({
+    namespace: "policy-preflight",
+    key: preflight.requestId,
+    payload: {
+      fundEnsName: input.fundEnsName,
+      callerEnsName: input.callerEnsName || null,
+      action: input.action,
+      inference: preflight
+    },
+    encrypted: true,
+    createdAt: new Date().toISOString()
+  });
+
   const intentMessage = PolicyClient.buildIntentMessage({
     fundEnsName: input.fundEnsName,
     action: input.action
@@ -90,13 +118,48 @@ export async function runPolicyAndWorkflow(input: {
       updatedAt: Date.now()
     });
 
+    const executionMemory = await memoryAdapter.write({
+      namespace: "execution-outcomes",
+      key: runId,
+      payload: {
+        policyId: planned.policyId,
+        workflowId,
+        runId,
+        state: reconciled.state,
+        plan: planned.plan
+      },
+      encrypted: true,
+      createdAt: new Date().toISOString()
+    });
+
+    const attestation = await chainAdapter.anchorAttestation({
+      policyId: planned.policyId,
+      action: input.action,
+      plan: planned.plan,
+      executionRef: runId,
+      artifactHash: executionMemory.hash
+    });
+
     return {
       ...planned,
+      computePreflight: {
+        provider: preflight.provider,
+        model: preflight.model,
+        requestId: preflight.requestId,
+        verified: preflight.verified
+      },
+      memoryArtifacts: {
+        preflight: preflightMemory,
+        execution: executionMemory
+      },
+      chainAttestation: attestation,
       intentProofIncluded: Boolean(intentProof),
       workflowId,
       runId,
       reconciliationState: reconciled.state,
-      auditPath: reconciled.auditPath
+      auditPath: reconciled.auditPath,
+      runLogCount: reconciled.logCount,
+      reliabilityAnalytics: reconciled.analytics
     };
   } catch (error) {
     return {

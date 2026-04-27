@@ -1,5 +1,5 @@
 import { JsonRpcProvider } from "ethers";
-import { EnsFundMetadata, EnsResolver } from "./types";
+import { EnsFundMetadata, EnsIdentityPassport, EnsResolver } from "./types";
 import { PolicyClientError } from "./errors";
 
 function requireText(text: string | null, key: string): string {
@@ -59,6 +59,49 @@ export class MainnetEnsResolver implements EnsResolver {
       return Boolean(value && value.trim().length > 0);
     } catch {
       return false;
+    }
+  }
+
+  async resolveIdentityPassport(agentEnsName: string): Promise<EnsIdentityPassport> {
+    try {
+      const resolver = await this.provider.getResolver(agentEnsName);
+      if (!resolver) {
+        throw new PolicyClientError("ENS_LOOKUP_FAILED", `No ENS resolver for ${agentEnsName}`);
+      }
+
+      const walletAddress = await this.provider.resolveName(agentEnsName);
+      const reverseName = walletAddress ? await this.provider.lookupAddress(walletAddress) : null;
+      const verifiedReverse = Boolean(reverseName && reverseName.toLowerCase() === agentEnsName.toLowerCase());
+
+      const role = (await resolver.getText("agent-role")) || "executor";
+      const capabilitiesRaw = (await resolver.getText("agent-capabilities")) || "";
+      const capabilities = capabilitiesRaw
+        .split(",")
+        .map((entry) => entry.trim())
+        .filter((entry) => entry.length > 0);
+
+      const metadataKeys = ["agent-description", "agent-endpoint", "agent-version", "agent-policy-profile"];
+      const metadataEntries = await Promise.all(
+        metadataKeys.map(async (key) => {
+          const value = await resolver.getText(key);
+          return [key, value || ""] as const;
+        })
+      );
+
+      return {
+        ensName: agentEnsName,
+        walletAddress,
+        resolverAddress: resolver.address,
+        verifiedReverse,
+        role,
+        capabilities,
+        metadata: Object.fromEntries(metadataEntries)
+      };
+    } catch (error) {
+      if (error instanceof PolicyClientError) {
+        throw error;
+      }
+      throw new PolicyClientError("ENS_LOOKUP_FAILED", String(error));
     }
   }
 }

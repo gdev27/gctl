@@ -6,5 +6,39 @@
   "policyRegistryChainId": 84532,
   "executionProfile": "standard",
   "agentRegistryAddress": "",
-  "agentId": "1"
+  "agentId": "1",
+  "roleAgents": [
+    {
+      "ensName": "planner.eurofund.eth",
+      "role": "planner",
+      "agentId": "planner-1",
+      "capabilities": ["policy-planning", "goal-decomposition", "constraint-modeling"],
+      "description": "Plans policy-compliant actions from institutional objectives.",
+      "endpoint": "mcp://policygraph/planner"
+    },
+    {
+      "ensName": "researcher.eurofund.eth",
+      "role": "researcher",
+      "agentId": "researcher-1",
+      "capabilities": ["market-scan", "signal-enrichment", "context-expansion"],
+      "description": "Adds market context and evidence to planning tasks.",
+      "endpoint": "mcp://policygraph/researcher"
+    },
+    {
+      "ensName": "critic.eurofund.eth",
+      "role": "critic",
+      "agentId": "critic-1",
+      "capabilities": ["risk-review", "policy-challenge", "failure-injection"],
+      "description": "Challenges plans and rejects risky policy paths.",
+      "endpoint": "mcp://policygraph/critic"
+    },
+    {
+      "ensName": "executor.eurofund.eth",
+      "role": "executor",
+      "agentId": "executor-1",
+      "capabilities": ["keeperhub-execution", "reconciliation", "attestation"],
+      "description": "Executes approved plans and records auditable outcomes.",
+      "endpoint": "mcp://policygraph/executor"
+    }
+  ]
 }

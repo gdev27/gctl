@@ -19,9 +19,20 @@ export type EnsFundMetadata = {
   executionProfile: "standard" | "private-only";
 };
 
+export type EnsIdentityPassport = {
+  ensName: string;
+  walletAddress: string | null;
+  resolverAddress: string;
+  verifiedReverse: boolean;
+  role: string;
+  capabilities: string[];
+  metadata: Record<string, string>;
+};
+
 export interface EnsResolver {
   resolveFundMetadata(fundEnsName: string): Promise<EnsFundMetadata>;
   verifyAgentAuthorization(agentEnsName: string): Promise<boolean>;
+  resolveIdentityPassport(agentEnsName: string): Promise<EnsIdentityPassport>;
 }
 
 export interface PolicyRegistryReader {
@@ -41,5 +52,6 @@ export interface PolicyClientSignerConfig {
 export type PlanActionResult = {
   policyId?: string;
   metadata?: EnsFundMetadata;
+  identityPassport?: EnsIdentityPassport;
   plan: ExecutionPlan;
 };
