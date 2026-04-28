@@ -1,6 +1,5 @@
 import { JsonRpcProvider, verifyMessage } from "ethers";
 import { DailyNotionalStore, evaluatePolicy } from "../../policy-engine/src/engine";
-import { hashPolicyGraph } from "../../policy-engine/src/compiler";
 import { PolicyStorageAdapter } from "../../policy-engine/src/storageAdapter";
 import { ExecutionPlan } from "../../policy-engine/src/types";
 import { PolicyClientError } from "./errors";
@@ -18,10 +17,17 @@ function failClosed(code: string, reason: string): PlanActionResult {
 }
 
 async function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
   const timeoutPromise = new Promise<never>((_, reject) => {
-    setTimeout(() => reject(new PolicyClientError("TIMEOUT", `Operation timed out after ${timeoutMs}ms`)), timeoutMs);
+    timeoutId = setTimeout(() => reject(new PolicyClientError("TIMEOUT", `Operation timed out after ${timeoutMs}ms`)), timeoutMs);
   });
-  return Promise.race([promise, timeoutPromise]);
+  try {
+    return await Promise.race([promise, timeoutPromise]);
+  } finally {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+  }
 }
 
 export type PolicyClientOptions = {
@@ -35,20 +41,74 @@ export type PolicyClientOptions = {
   agentRegistryAddress?: string;
   signer?: PolicyClientSignerConfig;
   createProvider?: (url: string) => JsonRpcProvider;
+  retryBaseDelayMs?: number;
+  retryMaxDelayMs?: number;
+  retryJitterRatio?: number;
+  notionalCacheMaxEntries?: number;
+  notionalCacheTtlMs?: number;
 };
 
 export class PolicyClient {
   private readonly timeoutMs: number;
   private readonly maxRetries: number;
   private readonly createProvider: (url: string) => JsonRpcProvider;
+  private readonly retryBaseDelayMs: number;
+  private readonly retryMaxDelayMs: number;
+  private readonly retryJitterRatio: number;
+  private readonly notionalCacheMaxEntries: number;
+  private readonly notionalCacheTtlMs: number;
   private ensProvider: JsonRpcProvider | null = null;
   private l2Provider: JsonRpcProvider | null = null;
-  private readonly notionalCache = new Map<string, number>();
+  private readonly notionalCache = new Map<string, { amount: number; expiresAt: number }>();
 
   constructor(private readonly opts: PolicyClientOptions) {
     this.timeoutMs = opts.timeoutMs ?? 5_000;
     this.maxRetries = opts.maxRetries ?? opts.retryCount ?? 1;
     this.createProvider = opts.createProvider ?? ((url: string) => new JsonRpcProvider(url));
+    this.retryBaseDelayMs = Math.max(0, opts.retryBaseDelayMs ?? 200);
+    this.retryMaxDelayMs = Math.max(this.retryBaseDelayMs, opts.retryMaxDelayMs ?? 2_000);
+    this.retryJitterRatio = Math.min(1, Math.max(0, opts.retryJitterRatio ?? 0.2));
+    this.notionalCacheMaxEntries = Math.max(1, opts.notionalCacheMaxEntries ?? 512);
+    this.notionalCacheTtlMs = Math.max(1, opts.notionalCacheTtlMs ?? 48 * 60 * 60 * 1000);
+  }
+
+  private getCachedNotional(key: string): number | undefined {
+    const cached = this.notionalCache.get(key);
+    if (!cached) {
+      return undefined;
+    }
+    if (cached.expiresAt <= Date.now()) {
+      this.notionalCache.delete(key);
+      return undefined;
+    }
+    // Keep LRU ordering by reinserting when accessed.
+    this.notionalCache.delete(key);
+    this.notionalCache.set(key, cached);
+    return cached.amount;
+  }
+
+  private setCachedNotional(key: string, amount: number): void {
+    const entry = { amount, expiresAt: Date.now() + this.notionalCacheTtlMs };
+    if (this.notionalCache.has(key)) {
+      this.notionalCache.delete(key);
+    }
+    this.notionalCache.set(key, entry);
+    if (this.notionalCache.size > this.notionalCacheMaxEntries) {
+      const oldestKey = this.notionalCache.keys().next().value as string | undefined;
+      if (oldestKey) {
+        this.notionalCache.delete(oldestKey);
+      }
+    }
+  }
+
+  private computeRetryDelayMs(attempt: number): number {
+    const baseDelay = Math.min(this.retryBaseDelayMs * 2 ** attempt, this.retryMaxDelayMs);
+    if (this.retryJitterRatio === 0) {
+      return baseDelay;
+    }
+    const jitterAmplitude = baseDelay * this.retryJitterRatio;
+    const jitter = (Math.random() * 2 - 1) * jitterAmplitude;
+    return Math.max(0, Math.round(baseDelay + jitter));
   }
 
   private async retry<T>(fn: () => Promise<T>): Promise<T> {
@@ -58,6 +118,9 @@ export class PolicyClient {
         return await withTimeout(fn(), this.timeoutMs);
       } catch (err) {
         error = err;
+        if (i < this.maxRetries) {
+          await new Promise((resolve) => setTimeout(resolve, this.computeRetryDelayMs(i)));
+        }
       }
     }
     throw error;
@@ -129,11 +192,19 @@ export class PolicyClient {
       }
 
       if (input.callerEnsName) {
-        const authorized = await this.retry(() => resolver.verifyAgentAuthorization(input.callerEnsName as string));
+        const agentResolver = await this.retry(() => resolver.getResolver(input.callerEnsName as string));
+        if (!agentResolver) {
+          return failClosed("AGENT_NOT_AUTHORIZED", input.callerEnsName);
+        }
+        const authorized = await this.retry(() =>
+          resolver.verifyAgentAuthorization(input.callerEnsName as string, agentResolver)
+        );
         if (!authorized) {
           return failClosed("AGENT_NOT_AUTHORIZED", input.callerEnsName);
         }
-        identityPassport = await this.retry(() => resolver.resolveIdentityPassport(input.callerEnsName as string));
+        identityPassport = await this.retry(() =>
+          resolver.resolveIdentityPassport(input.callerEnsName as string, agentResolver)
+        );
       }
 
       const l2Provider = this.getL2Provider();
@@ -144,25 +215,22 @@ export class PolicyClient {
       }
 
       const graph = await this.retry(() => this.opts.storage.loadGraph(metadata.policyId, { verifyHash: meta.hash }));
-      const localHash = hashPolicyGraph(graph); // Keep local check for defensive compatibility across adapter implementations.
-      if (localHash.toLowerCase() !== meta.hash.toLowerCase()) {
-        return failClosed("POLICY_HASH_MISMATCH", metadata.policyId);
-      }
 
       const notionalStore: DailyNotionalStore = {
         get: async (policyId, day) => {
           const key = `${policyId}:${day}`;
-          if (this.notionalCache.has(key)) {
-            return this.notionalCache.get(key) as number;
+          const cached = this.getCachedNotional(key);
+          if (typeof cached === "number") {
+            return cached;
           }
           const persisted = await this.opts.storage.readDailyNotional?.(policyId, day);
           const value = persisted ?? 0;
-          this.notionalCache.set(key, value);
+          this.setCachedNotional(key, value);
           return value;
         },
         set: async (policyId, day, amount) => {
           const key = `${policyId}:${day}`;
-          this.notionalCache.set(key, amount);
+          this.setCachedNotional(key, amount);
           await this.opts.storage.writeDailyNotional?.(policyId, day, amount);
         }
       };

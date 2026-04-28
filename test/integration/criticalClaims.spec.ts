@@ -94,6 +94,10 @@ describe("critical claims", () => {
       policyRegistryChainId: 84532,
       executionProfile: "private-only"
     });
+    vi.spyOn(MainnetEnsResolver.prototype, "getResolver").mockResolvedValue({
+      address: "0x0000000000000000000000000000000000000002",
+      getText: vi.fn(async () => "ok")
+    } as any);
     vi.spyOn(MainnetEnsResolver.prototype, "verifyAgentAuthorization").mockResolvedValue(true);
     vi.spyOn(MainnetEnsResolver.prototype, "resolveIdentityPassport").mockResolvedValue({
       ensName: "algo1.eurofund.eth",

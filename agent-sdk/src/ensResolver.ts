@@ -15,16 +15,26 @@ export class MainnetEnsResolver implements EnsResolver {
     private readonly agentRegistryAddress?: string
   ) {}
 
+  async getResolver(ensName: string) {
+    return this.provider.getResolver(ensName);
+  }
+
   async resolveFundMetadata(fundEnsName: string): Promise<EnsFundMetadata> {
     try {
       const resolver = await this.provider.getResolver(fundEnsName);
       if (!resolver) {
         throw new PolicyClientError("ENS_LOOKUP_FAILED", `No ENS resolver for ${fundEnsName}`);
       }
-      const policyId = requireText(await resolver.getText("policy-id"), "policy-id");
-      const policyRegistryAddress = requireText(await resolver.getText("policy-registry"), "policy-registry");
-      const chainIdRaw = requireText(await resolver.getText("policy-registry-chain-id"), "policy-registry-chain-id");
-      const executionProfileRaw = (await resolver.getText("execution-profile")) || "standard";
+      const [policyIdRaw, policyRegistryAddressRaw, chainIdRawRaw, executionProfileRecord] = await Promise.all([
+        resolver.getText("policy-id"),
+        resolver.getText("policy-registry"),
+        resolver.getText("policy-registry-chain-id"),
+        resolver.getText("execution-profile")
+      ]);
+      const policyId = requireText(policyIdRaw, "policy-id");
+      const policyRegistryAddress = requireText(policyRegistryAddressRaw, "policy-registry");
+      const chainIdRaw = requireText(chainIdRawRaw, "policy-registry-chain-id");
+      const executionProfileRaw = executionProfileRecord || "standard";
       const executionProfile =
         executionProfileRaw === "private-only" || executionProfileRaw === "standard" ? executionProfileRaw : "standard";
       const policyRegistryChainId = Number(chainIdRaw);
@@ -46,9 +56,12 @@ export class MainnetEnsResolver implements EnsResolver {
     }
   }
 
-  async verifyAgentAuthorization(agentEnsName: string): Promise<boolean> {
+  async verifyAgentAuthorization(
+    agentEnsName: string,
+    existingResolver: Awaited<ReturnType<JsonRpcProvider["getResolver"]>> | null = null
+  ): Promise<boolean> {
     try {
-      const resolver = await this.provider.getResolver(agentEnsName);
+      const resolver = existingResolver || (await this.provider.getResolver(agentEnsName));
       if (!resolver) {
         return false;
       }
@@ -62,9 +75,12 @@ export class MainnetEnsResolver implements EnsResolver {
     }
   }
 
-  async resolveIdentityPassport(agentEnsName: string): Promise<EnsIdentityPassport> {
+  async resolveIdentityPassport(
+    agentEnsName: string,
+    existingResolver: Awaited<ReturnType<JsonRpcProvider["getResolver"]>> | null = null
+  ): Promise<EnsIdentityPassport> {
     try {
-      const resolver = await this.provider.getResolver(agentEnsName);
+      const resolver = existingResolver || (await this.provider.getResolver(agentEnsName));
       if (!resolver) {
         throw new PolicyClientError("ENS_LOOKUP_FAILED", `No ENS resolver for ${agentEnsName}`);
       }
@@ -73,20 +89,18 @@ export class MainnetEnsResolver implements EnsResolver {
       const reverseName = walletAddress ? await this.provider.lookupAddress(walletAddress) : null;
       const verifiedReverse = Boolean(reverseName && reverseName.toLowerCase() === agentEnsName.toLowerCase());
 
-      const role = (await resolver.getText("agent-role")) || "executor";
-      const capabilitiesRaw = (await resolver.getText("agent-capabilities")) || "";
-      const capabilities = capabilitiesRaw
+      const metadataKeys = ["agent-description", "agent-endpoint", "agent-version", "agent-policy-profile"];
+      const [roleRecord, capabilitiesRecord, ...metadataValues] = await Promise.all([
+        resolver.getText("agent-role"),
+        resolver.getText("agent-capabilities"),
+        ...metadataKeys.map((key) => resolver.getText(key))
+      ]);
+      const role = roleRecord || "executor";
+      const capabilities = (capabilitiesRecord || "")
         .split(",")
         .map((entry) => entry.trim())
         .filter((entry) => entry.length > 0);
-
-      const metadataKeys = ["agent-description", "agent-endpoint", "agent-version", "agent-policy-profile"];
-      const metadataEntries = await Promise.all(
-        metadataKeys.map(async (key) => {
-          const value = await resolver.getText(key);
-          return [key, value || ""] as const;
-        })
-      );
+      const metadataEntries = metadataKeys.map((key, index) => [key, metadataValues[index] || ""] as const);
 
       return {
         ensName: agentEnsName,
