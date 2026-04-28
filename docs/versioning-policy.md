@@ -17,7 +17,7 @@ gctl uses semantic versioning for framework packages and interfaces.
 ## Release checklist
 
 1. All tests pass (`npm run test`, `npm run typecheck`).
-2. Changelog entries include migration notes.
+2. Changelog entries include migration notes in `CHANGELOG.md`.
 3. Docs and examples are updated for any new adapter or runtime requirement.
 4. Security-sensitive changes include explicit risk notes in PR description.
 

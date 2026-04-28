@@ -50,17 +50,17 @@ KeeperHub is the execution/reliability layer:
 - encrypted audit artifacts and analytics output in demo responses.
 
 ## Repository
-<PUBLIC_GITHUB_URL>
+https://github.com/gdev27/gctl
 
 ## Live demo
-<LIVE_DEMO_URL_OR_NA>
+`Local CLI demo (deterministic + swarm) with artifacts in docs/evidence/`
 
 ## Demo video (under 3 minutes)
-<VIDEO_URL>
+`TBD - recording pending upload`
 
 ## Contract deployment addresses
-- PolicyRegistry (Base Sepolia): `pending`
-- 0G attestation target (0G testnet): `pending`
+- PolicyRegistry (Base Sepolia): `0x9eaB6ef0Cdd26363f0608DD0908adcf1BC0a4814`
+- 0G attestation target (0G testnet): `n/a (current run uses simulated chain adapter receipt path)`
 - Optional ERC-8004 registry: `n/a`
 
 ## Protocol features/SDKs used
@@ -71,8 +71,8 @@ KeeperHub is the execution/reliability layer:
 
 ## Builder and contact
 - Gaurav Dev
-- Telegram: `<TELEGRAM_HANDLE>`
-- X: `<X_HANDLE>`
+- Telegram: `TBD by builder`
+- X: `TBD by builder`
 
 ## Setup commands for judges
 ```bash
@@ -88,3 +88,12 @@ npm run ens:passport
 ## Notes for judges
 - If RPC or partner credentials are missing, the system fails closed and returns explicit dependency error codes by design.
 - Deterministic fallback mode is available for reproducible judging flow when live endpoints are unstable.
+
+## Final evidence paste block
+- Safe-path output JSON artifact: `docs/evidence/demo-deterministic.json` (small branch currently denies on missing ENS policy text records)
+- Escalated-path output JSON artifact: `docs/evidence/demo-deterministic.json` (large branch currently denies on missing ENS policy text records)
+- Blocked-path output JSON artifact: `docs/evidence/demo-deterministic.json`
+- ENS passport output artifact: `docs/evidence/ens-passport.txt`
+- KeeperHub run evidence (`workflowId`, `runId`, status/logs/analytics): `not reached in current deterministic run because policy planning fails closed before execution`
+- 0G memory artifact evidence: `docs/evidence/demo-swarm.json` (`traces.*.provider` indicates simulated compute path)
+- 0G attestation evidence (tx/hash mapping): `n/a in current run`
