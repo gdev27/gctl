@@ -13,6 +13,9 @@ export type ReconcileInput = {
   executionPlan: unknown;
   maxPolls?: number;
   pollIntervalMs?: number;
+  pollBackoffMultiplier?: number;
+  pollMaxIntervalMs?: number;
+  pollJitterRatio?: number;
 };
 
 export async function reconcileWorkflow(
@@ -31,6 +34,12 @@ export async function reconcileWorkflow(
 }> {
   const maxPolls = input.maxPolls ?? 20;
   const pollIntervalMs = input.pollIntervalMs ?? 1000;
+  const backoffEnabled =
+    input.pollBackoffMultiplier !== undefined || input.pollMaxIntervalMs !== undefined || input.pollJitterRatio !== undefined;
+  const pollBackoffMultiplier = Math.max(1, input.pollBackoffMultiplier ?? 2);
+  const pollMaxIntervalMs = Math.max(pollIntervalMs, input.pollMaxIntervalMs ?? 10_000);
+  const pollJitterRatio = Math.min(1, Math.max(0, input.pollJitterRatio ?? 0.2));
+  let nextPollIntervalMs = pollIntervalMs;
 
   let finalState: WorkflowTerminalState = "running";
   let raw: unknown = null;
@@ -41,7 +50,17 @@ export async function reconcileWorkflow(
     if (TERMINAL_STATES.includes(finalState)) {
       break;
     }
-    await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
+    let delayMs = pollIntervalMs;
+    if (backoffEnabled) {
+      delayMs = nextPollIntervalMs;
+      if (pollJitterRatio > 0) {
+        const jitterAmplitude = delayMs * pollJitterRatio;
+        const jitter = (Math.random() * 2 - 1) * jitterAmplitude;
+        delayMs = Math.max(0, Math.round(delayMs + jitter));
+      }
+      nextPollIntervalMs = Math.min(Math.round(nextPollIntervalMs * pollBackoffMultiplier), pollMaxIntervalMs);
+    }
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
   }
 
   if (!TERMINAL_STATES.includes(finalState)) {

@@ -10,6 +10,7 @@ export function redactAndEncryptAuditPayload(
   encryptionKey: string
 ): Record<string, unknown> {
   const output: Record<string, unknown> = {};
+  const derivedKey = crypto.createHash("sha256").update(encryptionKey).digest();
 
   for (const [key, value] of Object.entries(payload)) {
     const className = classification[key] || "public";
@@ -23,7 +24,7 @@ export function redactAndEncryptAuditPayload(
       continue;
     }
 
-    output[key] = encryptValue(String(value), encryptionKey);
+    output[key] = encryptValue(String(value), derivedKey);
   }
 
   return output;
@@ -33,9 +34,8 @@ function hashValue(value: unknown): string {
   return crypto.createHash("sha256").update(JSON.stringify(value)).digest("hex");
 }
 
-function encryptValue(value: string, keyMaterial: string): string {
+function encryptValue(value: string, key: Buffer): string {
   const iv = crypto.randomBytes(12);
-  const key = crypto.createHash("sha256").update(keyMaterial).digest();
   const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
   const encrypted = Buffer.concat([cipher.update(value, "utf8"), cipher.final()]);
   const tag = cipher.getAuthTag();

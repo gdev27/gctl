@@ -70,8 +70,15 @@ export class MockKeeperHubClient implements KeeperHubClient {
     totalGasUsedWei?: string;
   }> {
     const runs = [...this.runs.values()];
-    const succeeded = runs.filter((run) => run.state === "succeeded").length;
-    const failed = runs.filter((run) => run.state !== "succeeded").length;
+    let succeeded = 0;
+    let failed = 0;
+    for (const run of runs) {
+      if (run.state === "succeeded") {
+        succeeded += 1;
+      } else {
+        failed += 1;
+      }
+    }
     const total = runs.length || 1;
 
     return {
