@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { EmptyState } from "../../components/empty-state";
+import { FallbackBanner } from "../../components/fallback-banner";
 import { PageHeader } from "../../components/page-header";
 import { getOnboardingChecks } from "../../lib/api";
 import { OnboardingCheck } from "../../lib/types";
@@ -12,12 +13,29 @@ export default function OnboardingPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    void (async () => {
-      const result = await getOnboardingChecks();
-      setChecks(result.data);
-      setDataSource(result.source);
-      setLoading(false);
-    })();
+    const controller = new AbortController();
+
+    async function loadChecks() {
+      try {
+        const result = await getOnboardingChecks({ signal: controller.signal });
+        if (controller.signal.aborted) {
+          return;
+        }
+        setChecks(result.data);
+        setDataSource(result.source);
+      } catch (error: unknown) {
+        if (error instanceof Error && error.name === "AbortError") {
+          return;
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    void loadChecks();
+    return () => controller.abort();
   }, []);
 
   const completedCount = checks.filter((check) => check.status === "ok").length;
@@ -43,16 +61,11 @@ export default function OnboardingPage() {
       </article>
 
       {dataSource === "fallback" ? (
-        <article className="card card-tight">
-          <span className="pill warn">Demo fallback data</span>
-          <p className="muted" style={{ marginTop: 8, marginBottom: 0 }}>
-            Readiness checks are currently based on fallback data because live endpoints were unreachable.
-          </p>
-        </article>
+        <FallbackBanner message="Readiness checks are currently based on fallback data because live endpoints were unreachable." />
       ) : null}
 
       {loading ? (
-        <article className="card">
+        <article className="card" role="status" aria-live="polite">
           <p className="muted">Loading readiness checks...</p>
         </article>
       ) : checks.length === 0 ? (
@@ -72,7 +85,7 @@ export default function OnboardingPage() {
                   {check.status === "ok" ? "Healthy" : check.status === "warn" ? "Review" : "Blocked"}
                 </span>
               </div>
-              <p className="muted" style={{ marginBottom: 0 }}>{check.detail}</p>
+              <p className="muted mb-0">{check.detail}</p>
             </article>
           ))}
         </div>

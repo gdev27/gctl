@@ -36,6 +36,12 @@ jobs:
       - name: Frontend typecheck
         run: npm run web:typecheck
 
+      - name: Frontend lint
+        run: npm run web:lint
+
+      - name: Frontend format check
+        run: npm run web:format:check
+
       - name: Frontend tests
         run: npm run web:test
 

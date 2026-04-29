@@ -2,6 +2,9 @@
   "name": "gctl",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=22 <23"
+  },
   "description": "gctl for policy-constrained autonomous agents.",
   "type": "module",
   "scripts": {
@@ -30,7 +33,9 @@
     "web:dev": "npm --prefix apps/web run dev",
     "web:build": "npm --prefix apps/web run build",
     "web:typecheck": "npm --prefix apps/web run typecheck",
-    "web:test": "npm --prefix apps/web run test"
+    "web:test": "npm --prefix apps/web run test",
+    "web:lint": "npm --prefix apps/web run lint",
+    "web:format:check": "npm --prefix apps/web run format:check"
   },
   "dependencies": {
     "ajv": "^8.20.0",

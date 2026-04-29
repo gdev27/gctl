@@ -1,26 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { PageHeader } from "../../components/page-header";
 
 const INDEXER_KEY = "gctl.settings.indexerUrl";
 const MODE_KEY = "gctl.settings.mode";
+const SETTINGS_UPDATED_EVENT = "gctl:settings-updated";
+type DisplayMode = "demo" | "live";
 
 export default function SettingsPage() {
-  const [indexerUrl, setIndexerUrl] = useState("http://localhost:4300");
-  const [mode, setMode] = useState("demo");
-  const [saveMessage, setSaveMessage] = useState("");
-
-  useEffect(() => {
-    const savedIndexer = window.localStorage.getItem(INDEXER_KEY);
+  const [indexerUrl, setIndexerUrl] = useState(() => {
+    if (typeof window === "undefined") {
+      return "http://localhost:4300";
+    }
+    return window.localStorage.getItem(INDEXER_KEY) || "http://localhost:4300";
+  });
+  const [mode, setMode] = useState<DisplayMode>(() => {
+    if (typeof window === "undefined") {
+      return "demo";
+    }
     const savedMode = window.localStorage.getItem(MODE_KEY);
-    if (savedIndexer) {
-      setIndexerUrl(savedIndexer);
-    }
-    if (savedMode) {
-      setMode(savedMode);
-    }
-  }, []);
+    return savedMode === "live" ? "live" : "demo";
+  });
+  const [saveMessage, setSaveMessage] = useState("");
 
   function saveSettings() {
     if (!indexerUrl.startsWith("http://") && !indexerUrl.startsWith("https://")) {
@@ -29,6 +31,7 @@ export default function SettingsPage() {
     }
     window.localStorage.setItem(INDEXER_KEY, indexerUrl);
     window.localStorage.setItem(MODE_KEY, mode);
+    window.dispatchEvent(new Event(SETTINGS_UPDATED_EVENT));
     setSaveMessage("Preferences saved for this browser profile.");
   }
 
@@ -52,7 +55,7 @@ export default function SettingsPage() {
               onChange={(event) => setIndexerUrl(event.target.value)}
             />
           </label>
-          <p className="muted" style={{ marginBottom: 0 }}>
+          <p className="muted mb-0">
             Stored locally as an operator reference; runtime API routing is controlled by deployment env vars.
           </p>
         </article>
@@ -60,27 +63,35 @@ export default function SettingsPage() {
           <h3>Display mode preference</h3>
           <label className="field">
             <span className="field-label">Mode</span>
-            <select className="select" value={mode} onChange={(event) => setMode(event.target.value)}>
+            <select
+              className="select"
+              value={mode}
+              onChange={(event) => setMode(event.target.value as DisplayMode)}
+            >
               <option value="demo">Demo-safe</option>
               <option value="live">Live-data</option>
             </select>
           </label>
           <p className="muted">This controls your preferred UI wording and reminder copy only.</p>
         </article>
-        <article className="card" style={{ gridColumn: "1 / -1" }}>
+        <article className="card full-width">
           <h3>Trust visibility</h3>
-          <p className="muted">Evidence panes show identity, policy, and audit links together to reduce ambiguity.</p>
-          <p style={{ marginBottom: 0 }}>
-            Changing settings never modifies permissions or backend source selection.
+          <p className="muted">
+            Evidence panes show identity, policy, and audit links together to reduce ambiguity.
           </p>
+          <p className="mb-0">Changing settings never modifies permissions or backend source selection.</p>
         </article>
       </div>
 
-      <div className="row" style={{ marginTop: 4 }}>
+      <div className="row mt-1">
         <button type="button" onClick={saveSettings} className="btn btn-primary">
           Save settings
         </button>
-        {saveMessage ? <span className="muted" aria-live="polite">{saveMessage}</span> : null}
+        {saveMessage ? (
+          <span className="muted" aria-live="polite">
+            {saveMessage}
+          </span>
+        ) : null}
       </div>
     </section>
   );

@@ -16,9 +16,11 @@ export function EmptyState({
       <h3>{title}</h3>
       <p className="muted">{description}</p>
       {ctaHref && ctaLabel ? (
-        <p>
-          <Link href={ctaHref}>{ctaLabel}</Link>
-        </p>
+        <div>
+          <Link href={ctaHref} className="btn btn-primary">
+            {ctaLabel}
+          </Link>
+        </div>
       ) : null}
     </div>
   );
