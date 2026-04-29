@@ -1,0 +1,23 @@
+
+> gctl@1.0.0 ens:passport
+> tsx ens-identity/scripts/showIdentityPassport.ts
+
+◇ injected env (27) from .env // tip: ◈ encrypted .env [www.dotenvx.com]
+{
+  "ensName": "vitalik.eth",
+  "authorized": false,
+  "passport": {
+    "ensName": "vitalik.eth",
+    "walletAddress": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+    "resolverAddress": "0x231b0Ee14048e9dCcD1d247744d114a4EB5E8E63",
+    "verifiedReverse": true,
+    "role": "executor",
+    "capabilities": [],
+    "metadata": {
+      "agent-description": "",
+      "agent-endpoint": "",
+      "agent-version": "",
+      "agent-policy-profile": ""
+    }
+  }
+}

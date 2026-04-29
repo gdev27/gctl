@@ -1,0 +1,64 @@
+{
+  "startedAt": "2026-04-29T12:12:13.191Z",
+  "endedAt": "2026-04-29T12:12:43.554Z",
+  "passed": 8,
+  "failed": 0,
+  "results": [
+    {
+      "id": "validate-env",
+      "command": "npm run validate:env",
+      "success": true,
+      "exitCode": 0,
+      "outputFile": "docs\\evidence\\preflight\\validate-env.txt"
+    },
+    {
+      "id": "validate-evidence",
+      "command": "npm run validate:evidence",
+      "success": true,
+      "exitCode": 0,
+      "outputFile": "docs\\evidence\\preflight\\validate-evidence.txt"
+    },
+    {
+      "id": "hh-compile",
+      "command": "npm run hh:compile",
+      "success": true,
+      "exitCode": 0,
+      "outputFile": "docs\\evidence\\preflight\\hh-compile.txt"
+    },
+    {
+      "id": "test",
+      "command": "npm run test",
+      "success": true,
+      "exitCode": 0,
+      "outputFile": "docs\\evidence\\preflight\\test.txt"
+    },
+    {
+      "id": "typecheck",
+      "command": "npm run typecheck",
+      "success": true,
+      "exitCode": 0,
+      "outputFile": "docs\\evidence\\preflight\\typecheck.txt"
+    },
+    {
+      "id": "demo-deterministic",
+      "command": "npm run demo:deterministic",
+      "success": true,
+      "exitCode": 0,
+      "outputFile": "docs\\evidence\\preflight\\demo-deterministic.txt"
+    },
+    {
+      "id": "demo-swarm",
+      "command": "npm run demo:swarm",
+      "success": true,
+      "exitCode": 0,
+      "outputFile": "docs\\evidence\\preflight\\demo-swarm.txt"
+    },
+    {
+      "id": "ens-passport",
+      "command": "npm run ens:passport",
+      "success": true,
+      "exitCode": 0,
+      "outputFile": "docs\\evidence\\preflight\\ens-passport.txt"
+    }
+  ]
+}

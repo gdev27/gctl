@@ -13,6 +13,14 @@ const registryAbi = [
   "function registerPolicy(bytes32 policyId, bytes32 hash, string calldata uri) external"
 ];
 
+function requireEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`${name} is required for demo initialization`);
+  }
+  return value;
+}
+
 async function main() {
   const policyPath = "dsl/samples/eurofund.mica.yaml";
   const configPath = path.resolve("ens-identity/config/agents.json");
@@ -56,8 +64,8 @@ async function main() {
   console.log(
     JSON.stringify(
       {
-        fundEnsName: process.env.FUND_ENS_NAME || "eurofund.eth",
-        agentEnsName: process.env.AGENT_ENS_NAME || "algo1.eurofund.eth",
+        fundEnsName: requireEnv("FUND_ENS_NAME"),
+        agentEnsName: requireEnv("AGENT_ENS_NAME"),
         policyId,
         hash,
         uri,

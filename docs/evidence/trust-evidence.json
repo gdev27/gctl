@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-04-29T11:04:48.000Z",
+  "source": "mixed",
+  "policy": {
+    "policyId": "eurofund-mica",
+    "version": "1.0.0",
+    "hash": "0x4f4f8e8c8921ca6c",
+    "uri": "ipfs://bafybeigctl-policy-core",
+    "active": true
+  },
+  "ens": {
+    "fund": {
+      "fundEnsName": "vitalik.eth"
+    },
+    "roleIdentities": [
+      {
+        "ensName": "planner.gctl.eth",
+        "role": "planner",
+        "capabilities": ["intent-drafting", "policy-alignment"],
+        "verifiedReverse": true
+      },
+      {
+        "ensName": "researcher.gctl.eth",
+        "role": "researcher",
+        "capabilities": ["context-enrichment"],
+        "verifiedReverse": true
+      },
+      {
+        "ensName": "critic.gctl.eth",
+        "role": "critic",
+        "capabilities": ["risk-challenge", "veto"],
+        "verifiedReverse": true
+      },
+      {
+        "ensName": "executor.gctl.eth",
+        "role": "executor",
+        "capabilities": ["workflow-execution", "reconciliation"],
+        "verifiedReverse": true
+      }
+    ]
+  },
+  "workflows": [
+    {
+      "workflowId": "safe-path-small-trade",
+      "runId": "run-safe-1001",
+      "state": "succeeded",
+      "pathType": "safe",
+      "auditPath": "reconciliation-logs/run-safe-1001.json",
+      "logRef": "keeperhub:logs:run-safe-1001",
+      "analyticsRef": "keeperhub:analytics:run-safe-1001"
+    },
+    {
+      "workflowId": "escalated-path-large-trade",
+      "runId": "run-esc-1002",
+      "state": "partial_fill",
+      "pathType": "escalated",
+      "auditPath": "reconciliation-logs/run-escalated-1002.json",
+      "logRef": "keeperhub:logs:run-esc-1002",
+      "analyticsRef": "keeperhub:analytics:run-esc-1002"
+    },
+    {
+      "workflowId": "denial-trace",
+      "runId": "run-blocked-1003",
+      "state": "denied",
+      "pathType": "blocked",
+      "auditPath": "reconciliation-logs/run-blocked-1003.json",
+      "logRef": "keeperhub:logs:run-blocked-1003",
+      "analyticsRef": "keeperhub:analytics:run-blocked-1003"
+    }
+  ],
+  "attestation": {
+    "kind": "simulated",
+    "receipt": "simulated-attestation:demo-receipt:0xattest001",
+    "mappedRunIds": ["run-safe-1001", "run-esc-1002", "run-blocked-1003"]
+  },
+  "invariantsCovered": [
+    "INV-FAILCLOSED-001",
+    "INV-ENS-001",
+    "INV-ENS-002",
+    "INV-WORKFLOW-001",
+    "INV-WORKFLOW-002",
+    "INV-ATTEST-001",
+    "INV-SOURCE-001"
+  ]
+}

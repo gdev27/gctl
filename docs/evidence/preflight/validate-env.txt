@@ -1,0 +1,7 @@
+
+> gctl@1.0.0 validate:env
+> tsx scripts/validateEnvContracts.ts
+
+Environment contracts validated:
+- .env.example
+- apps\web\.env.example

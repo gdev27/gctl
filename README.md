@@ -52,6 +52,10 @@ npm run demo:init
 npm run demo:deterministic
 npm run demo:swarm
 npm run ens:passport
+npm run web:dev
+npm run web:typecheck
+npm run web:test
+npm run web:build
 ```
 
 ## End-to-end demo path
@@ -101,6 +105,7 @@ npm run ens:passport
 - `keeperhub-workflows/`: workflow routing, execution, reconciliation, analytics.
 - `ens-identity/`: ENS metadata and role/subname management scripts.
 - `indexer/`: indexed state + compliance API scaffold.
+- `apps/web/`: Next.js frontend operations dashboard and BFF API routes.
 - `scripts/`: deployment and deterministic/simulation demos.
 - `test/`: unit, integration, and failure-injection tests.
 - `examples/`: open-source reference scenarios and starter templates.

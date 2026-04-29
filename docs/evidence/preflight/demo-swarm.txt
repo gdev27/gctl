@@ -1,0 +1,84 @@
+
+> gctl@1.0.0 demo:swarm
+> tsx agent-sdk/examples/treasuryTwinSwarm.ts
+
+◇ injected env (27) from .env // tip: ◈ secrets for agents [www.dotenvx.com]
+{
+  "allowed": true,
+  "objective": "Rebalance treasury into compliant risk-adjusted position",
+  "passport": {
+    "ensName": "vitalik.eth",
+    "walletAddress": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+    "resolverAddress": "0x231b0Ee14048e9dCcD1d247744d114a4EB5E8E63",
+    "verifiedReverse": true,
+    "role": "executor",
+    "capabilities": [],
+    "metadata": {
+      "agent-description": "",
+      "agent-endpoint": "",
+      "agent-version": "",
+      "agent-policy-profile": ""
+    }
+  },
+  "traces": {
+    "planner": {
+      "output": "[simulated-planner] objective=Create policy-compliant plan for: Rebalance treasury into compliant risk-adjusted position",
+      "provider": "0g-compute-simulated",
+      "model": "qwen3.6-plus",
+      "requestId": "05e8e23e-1b8a-4018-909c-cc88e5373a1f",
+      "verified": true,
+      "raw": {
+        "context": {
+          "action": {
+            "actionType": "swap",
+            "assetIn": "USDC",
+            "assetOut": "EURRWA",
+            "amount": 125000,
+            "timestamp": "2026-01-01T00:00:00.000Z"
+          },
+          "fundEnsName": "vitalik.eth"
+        }
+      }
+    },
+    "researcher": {
+      "output": "[simulated-researcher] objective=Add market and liquidity context for proposed action",
+      "provider": "0g-compute-simulated",
+      "model": "qwen3.6-plus",
+      "requestId": "dfdffc8d-6a86-47b3-8460-42656461f5a9",
+      "verified": true,
+      "raw": {
+        "context": {
+          "draftPlan": "[simulated-planner] objective=Create policy-compliant plan for: Rebalance treasury into compliant risk-adjusted position",
+          "action": {
+            "actionType": "swap",
+            "assetIn": "USDC",
+            "assetOut": "EURRWA",
+            "amount": 125000,
+            "timestamp": "2026-01-01T00:00:00.000Z"
+          }
+        }
+      }
+    },
+    "critic": {
+      "output": "[simulated-critic] objective=Challenge the plan and flag policy or execution risks",
+      "provider": "0g-compute-simulated",
+      "model": "qwen3.6-plus",
+      "requestId": "7fb70339-a58b-4e65-b393-b78581fdd700",
+      "verified": true,
+      "raw": {
+        "context": {
+          "draftPlan": "[simulated-planner] objective=Create policy-compliant plan for: Rebalance treasury into compliant risk-adjusted position",
+          "research": "[simulated-researcher] objective=Add market and liquidity context for proposed action",
+          "amount": 125000
+        }
+      }
+    }
+  },
+  "execution": {
+    "plan": {
+      "allowed": false,
+      "reason": "dependency_failure",
+      "errorCode": "ENS_RECORD_MALFORMED:Missing ENS text record: policy-id"
+    }
+  }
+}

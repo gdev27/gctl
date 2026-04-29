@@ -10,7 +10,10 @@
     "test": "vitest run",
     "test:integration": "vitest run test/integration",
     "test:watch": "vitest",
-    "verify": "npm run hh:compile && npm run test && npm run typecheck",
+    "verify": "npm run hh:compile && npm run test && npm run typecheck && npm run validate:env && npm run validate:evidence",
+    "validate:env": "tsx scripts/validateEnvContracts.ts",
+    "validate:evidence": "tsx scripts/validateEvidence.ts",
+    "judge:preflight": "tsx scripts/judgePreflight.ts",
     "clean:runtime": "tsx scripts/cleanRuntime.ts",
     "clean:all-local": "tsx scripts/cleanAllLocal.ts",
     "compile:policy": "tsx scripts/compilePolicy.ts",
@@ -23,7 +26,11 @@
     "demo:all": "tsx scripts/initDemo.ts && tsx scripts/demoSmallTrade.ts && tsx scripts/demoLargeTrade.ts",
     "hh:compile": "hardhat compile",
     "hh:test": "hardhat test",
-    "indexer:api": "tsx indexer/src/api.ts"
+    "indexer:api": "tsx indexer/src/api.ts",
+    "web:dev": "npm --prefix apps/web run dev",
+    "web:build": "npm --prefix apps/web run build",
+    "web:typecheck": "npm --prefix apps/web run typecheck",
+    "web:test": "npm --prefix apps/web run test"
   },
   "dependencies": {
     "ajv": "^8.20.0",

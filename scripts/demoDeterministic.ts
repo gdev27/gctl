@@ -3,10 +3,18 @@ import { runPolicyAndWorkflow } from "../keeperhub-workflows/src/runDemo";
 
 dotenv.config();
 
+function requireEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`${name} is required for deterministic demo execution`);
+  }
+  return value;
+}
+
 async function run(amount: number) {
   return runPolicyAndWorkflow({
-    fundEnsName: process.env.FUND_ENS_NAME || "eurofund.eth",
-    callerEnsName: process.env.AGENT_ENS_NAME || "algo1.eurofund.eth",
+    fundEnsName: requireEnv("FUND_ENS_NAME"),
+    callerEnsName: requireEnv("AGENT_ENS_NAME"),
     action: {
       actionType: "swap",
       assetIn: "EURC",

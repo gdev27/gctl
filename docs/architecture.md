@@ -40,3 +40,9 @@ flowchart LR
 - **0G Storage memory** persists encrypted swarm context and execution artifacts.
 - **KeeperHub** executes policy-approved actions with run-level observability.
 - **PolicyClient is fail-closed**: dependency or verification failures default to deny.
+
+## Frontend operations surface
+- `apps/web` provides the primary operator UI for onboarding, policies, runs, swarm state, and evidence views.
+- Frontend BFF endpoints under `/api/ops/*` normalize indexer responses for dashboard consumption.
+- UI defaults to deterministic fallback snapshots when runtime endpoints are unavailable so trust workflows stay inspectable.
+- API and page layers carry explicit `source` semantics (`live` or `fallback`) to preserve operator trust and prevent synthetic data confusion.
