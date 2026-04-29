@@ -15,3 +15,6 @@ reconciliation-logs/
 .cursor/
 .claude/
 indexer/index-state.json
+
+.vercel
+.env*.local
