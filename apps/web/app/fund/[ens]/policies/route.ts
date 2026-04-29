@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { mockPolicies } from "../../../../lib/mock-data";
+import { loadPolicies } from "../../../api/ops/_lib/data";
 
 export async function GET(): Promise<NextResponse> {
-  return NextResponse.json(mockPolicies);
+  const policiesResult = await loadPolicies();
+  return NextResponse.json(policiesResult.data);
 }

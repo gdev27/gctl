@@ -1,8 +1,21 @@
-import { mockChecks, mockIdentityEvidence, mockOverview, mockPolicies, mockWorkflows } from "../../../../lib/mock-data";
-import { IndexedPolicy, IndexedWorkflow, OnboardingCheck, OpsOverview, IdentityEvidence } from "../../../../lib/types";
+import {
+  mockChecks,
+  mockIdentityEvidence,
+  mockOverview,
+  mockPolicies,
+  mockWorkflows
+} from "../../../../lib/mock-data";
+import {
+  IndexedPolicy,
+  IndexedWorkflow,
+  OnboardingCheck,
+  OpsOverview,
+  IdentityEvidence
+} from "../../../../lib/types";
+import { cache } from "react";
 
-const indexerBase = process.env.NEXT_PUBLIC_INDEXER_URL || process.env.INDEXER_URL || "http://localhost:4300";
-const fundEnsName = process.env.NEXT_PUBLIC_FUND_ENS_NAME || process.env.FUND_ENS_NAME || "fund-not-configured.eth";
+const indexerBase = process.env.INDEXER_URL || "http://localhost:4300";
+const fundEnsName = process.env.FUND_ENS_NAME || "fund-not-configured.eth";
 
 export type TrustStatus = "healthy" | "degraded" | "fallback";
 
@@ -59,12 +72,31 @@ async function fetchIndexer<T>(path: string, fallback: T): Promise<SourceResult<
   }
 }
 
-export async function loadPolicies(): Promise<SourceResult<IndexedPolicy[]>> {
+export const loadPolicies = cache(async (): Promise<SourceResult<IndexedPolicy[]>> => {
   return fetchIndexer<IndexedPolicy[]>(`/fund/${fundEnsName}/policies`, mockPolicies);
-}
+});
 
-export async function loadWorkflows(): Promise<SourceResult<IndexedWorkflow[]>> {
+export const loadWorkflows = cache(async (): Promise<SourceResult<IndexedWorkflow[]>> => {
   return fetchIndexer<IndexedWorkflow[]>("/workflows", mockWorkflows);
+});
+
+export async function loadWorkflowById(id: string): Promise<SourceResult<IndexedWorkflow | null>> {
+  const runResult = await fetchIndexer<IndexedWorkflow | null>(`/runs/${id}`, null);
+  if (runResult.data) {
+    return runResult;
+  }
+  const workflowResult = await fetchIndexer<IndexedWorkflow | null>(`/workflows/${id}`, null);
+  if (workflowResult.data) {
+    return workflowResult;
+  }
+  const trustMeta = mergeTrustMeta(runResult, workflowResult);
+  return {
+    ...trustMeta,
+    data: null,
+    reasonCode: trustMeta.reasonCode || "RUN_NOT_FOUND",
+    recoveryAction:
+      trustMeta.recoveryAction || "Verify the run identifier and confirm workflow indexing is current."
+  };
 }
 
 export async function loadOverview(): Promise<SourceResult<OpsOverview>> {
@@ -72,7 +104,9 @@ export async function loadOverview(): Promise<SourceResult<OpsOverview>> {
   const workflowsResult = await loadWorkflows();
   const policies = policiesResult.data;
   const workflows = workflowsResult.data;
-  const failClosedAlerts = workflows.filter((w) => w.state === "reverted" || w.state === "timed_out" || w.state === "denied").length;
+  const failClosedAlerts = workflows.filter(
+    (w) => w.state === "reverted" || w.state === "timed_out" || w.state === "denied"
+  ).length;
   const succeeded = workflows.filter((w) => w.state === "succeeded").length;
   const deterministicSuccessRate = workflows.length === 0 ? 0 : succeeded / workflows.length;
 
@@ -103,26 +137,32 @@ export async function loadChecks(): Promise<SourceResult<OnboardingCheck[]>> {
 
   const trustMeta = mergeTrustMeta(policiesResult, workflowsResult);
   const checks: OnboardingCheck[] = [
-      {
-        key: "indexer",
-        label: "Indexer API",
-        status: workflows.length > 0 ? "ok" : "warn",
-        detail: workflows.length > 0 ? "Connected and returning workflow snapshots." : "No workflow snapshots returned."
-      },
-      {
-        key: "policy",
-        label: "Policy inventory",
-        status: policies.length > 0 ? "ok" : "bad",
-        detail: policies.length > 0 ? `${policies.length} policy records discovered.` : "No policy records found."
-      },
-      {
-        key: "freshness",
-        label: "Data freshness",
-        status: isFresh ? "ok" : "warn",
-        detail: isFresh ? "Indexed data updated within the last 30 minutes." : "Indexed data may be stale; refresh pipeline recommended."
-      },
-      ...mockChecks.filter((check) => check.key === "ens" || check.key === "attestation")
-    ];
+    {
+      key: "indexer",
+      label: "Indexer API",
+      status: workflows.length > 0 ? "ok" : "warn",
+      detail:
+        workflows.length > 0
+          ? "Connected and returning workflow snapshots."
+          : "No workflow snapshots returned."
+    },
+    {
+      key: "policy",
+      label: "Policy inventory",
+      status: policies.length > 0 ? "ok" : "bad",
+      detail:
+        policies.length > 0 ? `${policies.length} policy records discovered.` : "No policy records found."
+    },
+    {
+      key: "freshness",
+      label: "Data freshness",
+      status: isFresh ? "ok" : "warn",
+      detail: isFresh
+        ? "Indexed data updated within the last 30 minutes."
+        : "Indexed data may be stale; refresh pipeline recommended."
+    },
+    ...mockChecks.filter((check) => check.key === "ens" || check.key === "attestation")
+  ];
 
   return {
     ...trustMeta,
@@ -145,7 +185,8 @@ export async function loadEvidence(): Promise<SourceResult<IdentityEvidence[]>> 
       source: workflowsResult.source,
       trustStatus: workflowsResult.trustStatus,
       reasonCode: workflowsResult.reasonCode || "EVIDENCE_WORKFLOWS_EMPTY",
-      recoveryAction: workflowsResult.recoveryAction || "Run deterministic/swarm demos to populate evidence snapshots."
+      recoveryAction:
+        workflowsResult.recoveryAction || "Run deterministic/swarm demos to populate evidence snapshots."
     };
   }
 
@@ -165,5 +206,8 @@ export async function loadEvidence(): Promise<SourceResult<IdentityEvidence[]>> 
 }
 
 export async function loadFailClosed(): Promise<SourceResult<IndexedWorkflow[]>> {
-  return fetchIndexer<IndexedWorkflow[]>("/alerts/fail-closed", mockWorkflows.filter((w) => w.state === "denied"));
+  return fetchIndexer<IndexedWorkflow[]>(
+    "/alerts/fail-closed",
+    mockWorkflows.filter((w) => w.state === "denied")
+  );
 }

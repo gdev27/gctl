@@ -58,14 +58,31 @@ export const mockOverview: OpsOverview = {
   policyCount: mockPolicies.length,
   activePolicies: mockPolicies.filter((p) => p.active).length,
   workflowCount: mockWorkflows.length,
-  failClosedAlerts: mockWorkflows.filter((w) => w.state === "reverted" || w.state === "timed_out" || w.state === "denied").length,
+  failClosedAlerts: mockWorkflows.filter(
+    (w) => w.state === "reverted" || w.state === "timed_out" || w.state === "denied"
+  ).length,
   deterministicSuccessRate: 0.78
 };
 
 export const mockChecks: OnboardingCheck[] = [
-  { key: "indexer", label: "Indexer API", status: "ok", detail: "Connected and returning workflow snapshots." },
-  { key: "ens", label: "ENS Metadata", status: "warn", detail: "Some records are missing optional role descriptions." },
-  { key: "keeperhub", label: "KeeperHub", status: "ok", detail: "Execution path is healthy and polling works." },
+  {
+    key: "indexer",
+    label: "Indexer API",
+    status: "ok",
+    detail: "Connected and returning workflow snapshots."
+  },
+  {
+    key: "ens",
+    label: "ENS Metadata",
+    status: "warn",
+    detail: "Some records are missing optional role descriptions."
+  },
+  {
+    key: "keeperhub",
+    label: "KeeperHub",
+    status: "ok",
+    detail: "Execution path is healthy and polling works."
+  },
   { key: "attestation", label: "0G Attestation", status: "warn", detail: "Running in demo receipt mode." }
 ];
 

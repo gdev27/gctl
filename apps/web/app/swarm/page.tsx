@@ -48,9 +48,10 @@ export default function SwarmPage() {
       <article className="card">
         <h3>Shared memory and identity guarantees</h3>
         <p className="muted">
-          Each role writes and reads encrypted memory artifacts, while ENS passport metadata enforces identity semantics.
+          Each role writes and reads encrypted memory artifacts, while ENS passport metadata enforces identity
+          semantics.
         </p>
-        <p style={{ marginBottom: 0 }}>
+        <p className="mb-0">
           The critic can block unsafe plans before the executor submits any onchain action.
         </p>
       </article>

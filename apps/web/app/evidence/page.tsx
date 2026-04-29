@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { CopyTextButton } from "../../components/copy-text-button";
 import { EmptyState } from "../../components/empty-state";
+import { FallbackBanner } from "../../components/fallback-banner";
 import { PageHeader } from "../../components/page-header";
 import { getIdentityEvidence } from "../../lib/api";
 import { IdentityEvidence } from "../../lib/types";
@@ -13,12 +14,29 @@ export default function EvidencePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    void (async () => {
-      const result = await getIdentityEvidence();
-      setEvidence(result.data);
-      setDataSource(result.source);
-      setLoading(false);
-    })();
+    const controller = new AbortController();
+
+    async function loadEvidenceData() {
+      try {
+        const result = await getIdentityEvidence({ signal: controller.signal });
+        if (controller.signal.aborted) {
+          return;
+        }
+        setEvidence(result.data);
+        setDataSource(result.source);
+      } catch (error: unknown) {
+        if (error instanceof Error && error.name === "AbortError") {
+          return;
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    void loadEvidenceData();
+    return () => controller.abort();
   }, []);
 
   return (
@@ -29,15 +47,10 @@ export default function EvidencePage() {
         description="Use this view to verify who acted, what was attested, and where audit artifacts are stored."
       />
       {dataSource === "fallback" ? (
-        <article className="card card-tight">
-          <span className="pill warn">Demo fallback data</span>
-          <p className="muted" style={{ marginTop: 8, marginBottom: 0 }}>
-            Evidence rows are currently fallback snapshots and should not be treated as live attestations.
-          </p>
-        </article>
+        <FallbackBanner message="Evidence rows are currently fallback snapshots and should not be treated as live attestations." />
       ) : null}
       {loading ? (
-        <article className="card">
+        <article className="card" role="status" aria-live="polite">
           <p className="muted">Loading identity evidence...</p>
         </article>
       ) : evidence.length === 0 ? (

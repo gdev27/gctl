@@ -31,7 +31,17 @@ function isActive(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function NavGroup({ title, links, pathname, onClose }: { title: string; links: NavLink[]; pathname: string; onClose: () => void }) {
+function NavGroup({
+  title,
+  links,
+  pathname,
+  onClose
+}: {
+  title: string;
+  links: NavLink[];
+  pathname: string;
+  onClose: () => void;
+}) {
   return (
     <>
       <p className="nav-group-title">{title}</p>
@@ -47,7 +57,6 @@ function NavGroup({ title, links, pathname, onClose }: { title: string; links: N
                 aria-current={active ? "page" : undefined}
               >
                 <span>{link.label}</span>
-                {active ? <span className="pill neutral">Current</span> : null}
               </Link>
             </li>
           );
@@ -57,14 +66,29 @@ function NavGroup({ title, links, pathname, onClose }: { title: string; links: N
   );
 }
 
-export function SideNav({ navOpen, onClose }: { navOpen: boolean; onClose: () => void }) {
+export function SideNav({
+  navOpen,
+  isMobileLayout,
+  onClose
+}: {
+  navOpen: boolean;
+  isMobileLayout: boolean;
+  onClose: () => void;
+}) {
   const pathname = usePathname();
 
   return (
-    <aside id="primary-navigation" className="nav" data-open={navOpen} aria-label="Main navigation">
+    <aside
+      id="primary-navigation"
+      className="nav"
+      data-open={navOpen ? "true" : "false"}
+      aria-hidden={isMobileLayout && !navOpen}
+      aria-label="Main navigation"
+    >
       <div className="nav-header">
         <strong>gctl Control Plane</strong>
         <p className="muted">Policy-safe operations with clear evidence trails.</p>
+        <p className="muted mb-0">Shortcut: Ctrl/Cmd + K jumps to runs.</p>
       </div>
       <NavGroup title="Overview" links={overviewLinks} pathname={pathname} onClose={onClose} />
       <NavGroup title="Operations" links={operationsLinks} pathname={pathname} onClose={onClose} />

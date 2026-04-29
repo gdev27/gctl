@@ -1,34 +1,27 @@
 import Link from "next/link";
-import { loadWorkflows } from "../../api/ops/_lib/data";
+import { notFound } from "next/navigation";
+import { loadWorkflowById } from "../../api/ops/_lib/data";
 import { CopyTextButton } from "../../../components/copy-text-button";
+import { FallbackBanner } from "../../../components/fallback-banner";
 import { PageHeader } from "../../../components/page-header";
 import { StatusPill } from "../../../components/status-pill";
 import { statusReason } from "../../../lib/status";
 
 export default async function RunDetailsPage({ params }: { params: Promise<{ runId: string }> }) {
   const { runId } = await params;
-  const workflowsResult = await loadWorkflows();
-  const run = workflowsResult.data.find((item) => item.runId === runId || item.workflowId === runId);
+  if (!/^[a-zA-Z0-9:_-]{3,128}$/.test(runId)) {
+    notFound();
+  }
+  const workflowsResult = await loadWorkflowById(runId);
+  const run = workflowsResult.data;
 
   if (!run) {
-    return (
-      <section className="page">
-        <PageHeader
-          eyebrow="Run Detail"
-          title="Run not found"
-          description={`No run exists for ${runId}.`}
-        />
-        <article className="card">
-          <p className="muted">Check the run identifier or return to the run center for available records.</p>
-          <p style={{ marginBottom: 0 }}>
-            <Link href="/runs">Back to run center</Link>
-          </p>
-        </article>
-      </section>
-    );
+    notFound();
   }
 
-  const pathType = run.pathType ? `${run.pathType[0].toUpperCase()}${run.pathType.slice(1)} Path` : "Unclassified";
+  const pathType = run.pathType
+    ? `${run.pathType.charAt(0).toUpperCase()}${run.pathType.slice(1)} Path`
+    : "Unclassified";
   const isFailClosed = run.state === "denied" || run.state === "timed_out" || run.state === "reverted";
 
   return (
@@ -38,14 +31,13 @@ export default async function RunDetailsPage({ params }: { params: Promise<{ run
         title={`Run ${run.runId}`}
         description="Review execution outcome, policy linkage, and evidence pointers before taking action."
       />
+      <p className="muted mb-0">Runs / {run.runId}</p>
+      <p className="mb-0">
+        <Link href="/runs">Back to run center</Link>
+      </p>
 
       {workflowsResult.source === "fallback" ? (
-        <article className="card card-tight">
-          <span className="pill warn">Demo fallback data</span>
-          <p className="muted" style={{ marginTop: 8, marginBottom: 0 }}>
-            This run detail is rendered from fallback snapshots because live run data was unavailable.
-          </p>
-        </article>
+        <FallbackBanner message="This run detail is rendered from fallback snapshots because live run data was unavailable." />
       ) : null}
 
       <article className="card">
@@ -73,9 +65,9 @@ export default async function RunDetailsPage({ params }: { params: Promise<{ run
             <p>{pathType}</p>
           </div>
         </div>
-        <div className="card card-tight" style={{ marginTop: 16 }}>
+        <div className="card card-tight mt-4 support-card">
           <p className="field-label">Status context</p>
-          <p style={{ marginBottom: 0 }}>{statusReason(run.state)}</p>
+          <p className="mb-0">{statusReason(run.state)}</p>
         </div>
       </article>
 
@@ -86,7 +78,7 @@ export default async function RunDetailsPage({ params }: { params: Promise<{ run
           <p className="mono">{run.auditPath}</p>
           <CopyTextButton value={run.auditPath} />
         </div>
-        <p className="muted" style={{ marginBottom: 0 }}>
+        <p className="muted mb-0">
           For denied or timed-out outcomes, confirm readiness checks and policy limits before retrying.
         </p>
       </article>
@@ -94,17 +86,13 @@ export default async function RunDetailsPage({ params }: { params: Promise<{ run
       {isFailClosed ? (
         <article className="card">
           <h3>Fail-closed recovery steps</h3>
-          <ol className="muted" style={{ margin: 0, paddingLeft: 18 }}>
+          <ol className="muted run-recovery-list">
             <li>Confirm readiness checks are healthy in the Readiness view.</li>
             <li>Validate policy limits and intent fields before re-running.</li>
             <li>Re-run only after evidence and policy references match expected values.</li>
           </ol>
         </article>
       ) : null}
-
-      <p>
-        <Link href="/runs">Back to run center</Link>
-      </p>
     </section>
   );
 }
