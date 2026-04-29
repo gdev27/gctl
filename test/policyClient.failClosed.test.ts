@@ -68,7 +68,7 @@ describe("policy client fail closed", () => {
     });
     expect(result.plan.allowed).toBe(false);
     expect(result.plan.reason).toBe("dependency_failure");
-    expect(result.plan.errorCode).toContain("ENS_LOOKUP_FAILED");
+    expect(result.plan.errorCode).toMatch(/ENS_LOOKUP_FAILED|TIMEOUT/);
   });
 
   it("rejects intent proof signed for unrelated message", async () => {

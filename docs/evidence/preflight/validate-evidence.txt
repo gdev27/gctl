@@ -1,0 +1,7 @@
+
+> gctl@1.0.0 validate:evidence
+> tsx scripts/validateEvidence.ts
+
+Evidence validation passed:
+- schema: docs\evidence\schema\trust-evidence.schema.json
+- evidence: docs\evidence\trust-evidence.json

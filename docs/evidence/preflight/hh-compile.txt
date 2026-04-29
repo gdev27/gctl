@@ -1,0 +1,6 @@
+
+> gctl@1.0.0 hh:compile
+> hardhat compile
+
+◇ injected env (27) from .env // tip: ⌘ enable debugging { debug: true }
+No contracts to compile

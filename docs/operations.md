@@ -20,3 +20,16 @@
   - `succeeded`, `reverted`, `partial_fill`, `timed_out`, `cancelled`.
 - Alerts for `reverted` / `timed_out`.
 - Store audit log path and index into compliance API.
+
+## Environment contract and startup checks
+1. Keep browser-exposed variables in `apps/web/.env.example` under `NEXT_PUBLIC_*`.
+2. Never place secret-like keys (`*_PRIVATE_KEY`, `*_TOKEN`, `*_SECRET`, `*_JWT`, `*_API_KEY`) in `NEXT_PUBLIC_*` namespace.
+3. Validate env contracts before judge/demo runs:
+   - `npm run validate:env`
+6. Run full judge preflight before submission:
+   - `npm run judge:preflight`
+   - Review `docs/evidence/judge-preflight-report.md`
+4. Demo-critical ENS identity values must be explicit:
+   - `FUND_ENS_NAME`
+   - `AGENT_ENS_NAME`
+5. Deterministic demo scripts fail loudly when required env keys are missing; they do not silently fall back to hardcoded trust identities.

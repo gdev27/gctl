@@ -1,6 +1,9 @@
 node_modules/
+apps/web/node_modules/
 dist/
 coverage/
+.next/
+apps/web/.next/
 .env
 cache/
 artifacts/

@@ -1,0 +1,13 @@
+
+> gctl@1.0.0 test
+> vitest run
+
+
+ RUN  v4.1.5 C:/Users/gd27t/Downloads/gctl
+
+
+ Test Files  11 passed | 1 skipped (12)
+      Tests  30 passed | 1 skipped (31)
+   Start at  14:12:22
+   Duration  2.99s (transform 1.22s, setup 0ms, import 4.08s, tests 2.47s, environment 4ms)
+

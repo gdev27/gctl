@@ -1,0 +1,23 @@
+
+> gctl@1.0.0 demo:deterministic
+> tsx scripts/demoDeterministic.ts
+
+◇ injected env (27) from .env // tip: ⌘ multiple files { path: ['.env.local', '.env'] }
+{
+  "mode": "deterministic-demo",
+  "timestamp": "2026-01-01T00:00:00.000Z",
+  "small": {
+    "plan": {
+      "allowed": false,
+      "reason": "dependency_failure",
+      "errorCode": "ENS_RECORD_MALFORMED:Missing ENS text record: policy-id"
+    }
+  },
+  "large": {
+    "plan": {
+      "allowed": false,
+      "reason": "dependency_failure",
+      "errorCode": "ENS_RECORD_MALFORMED:Missing ENS text record: policy-id"
+    }
+  }
+}
