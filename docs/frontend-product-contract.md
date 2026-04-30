@@ -51,23 +51,21 @@ The gctl frontend is the consumer-facing control plane for policy-constrained au
 
 ## Visual system contract
 - **Aesthetic direction:** calm institutional cockpit. The brand voice is "policy-constrained autonomy you can prove" — confident, never decorative.
-- **Foundation:** Tailwind v4 (CSS-first `@theme` tokens in `apps/web/app/globals.css`, no `tailwind.config`) targeted only at `apps/web`, paired with shadcn/ui (New York, slate base) primitives in `apps/web/components/ui/*`. The `cn` helper in `apps/web/lib/cn.ts` is the single class composer.
-- **Brand assets:** `apps/web/components/brand/logo.tsx` ships an inline-SVG wordmark + policy-lattice glyph that adapts via `currentColor`. No raster brand assets in components.
-- **Color tokens (semantic, both themes):** `bg`, `surface`, `surface-strong`, `border`, `border-strong`, `text`, `text-muted`, `primary`, `accent`, `good`, `warn`, `bad`, `info` plus `*-soft` companions and `chart-1..5`. Tokens are declared in `oklch` for perceptual uniformity. No hardcoded hex/rgba colors are allowed in components.
-- **Type & spacing:** Geist Sans for display + body, JetBrains Mono for hashes/IDs, type scale 12/13/14/15/16/18/20/24/30/36/48/60 with display variants for hero numbers. Spacing follows Tailwind's default 4px scale; radii are `sm 6 / md 10 / lg 14 / xl 20`.
-- **Elevation:** three-layer shadow system (`shadow-card`, `shadow-popover`, `shadow-overlay`) defined in `@theme` and reused across cards, popovers, and modals/sheets.
-- **Iconography & charts:** `lucide-react` is the canonical icon set (no ASCII fallbacks like `OK`/`!`/`X`); status iconography lives in `components/status-pill.tsx`. Trends use Recharts via `components/charts/{sparkline,area-trend,donut-status}.tsx`.
-- **Information architecture:** `/` is the marketing landing page; everything authenticated lives under `/app/*` (dashboard, runs, policies, swarm, evidence, onboarding, settings, about) and is wrapped by `AppShell`.
-- **App shell:** every authenticated screen renders inside `components/shell/app-shell.tsx` with a sticky top bar, collapsible icon-aware side nav (state persisted under `gctl.ui.desktopNavCollapsed`), and a Radix Sheet drawer on mobile (focus trap, escape close, scroll lock).
-- **Command palette:** `Ctrl/Cmd+K` opens `components/shell/command-palette.tsx` (cmdk + shadcn) with Navigate / Search runs / Actions / Help groups.
-- **Keyboard shortcuts:** `g d` → dashboard, `g r` → runs, `g p` → policies, `g e` → evidence, `g s` → settings, `?` → opens the keyboard shortcut help dialog. Shortcuts are inert while focus is in editable text.
-- **Theming:** `components/theme-provider.tsx` exposes `light` / `dark` / `system` via React Context. Theme resolution happens before paint via the static `/public/theme-init.js` script (avoids inline-script CSP exceptions and FOUC). Both themes ship full token coverage.
-- **Motion:** framer-motion drives a subtle page-enter fade and a card stagger on the dashboard. All motion respects `prefers-reduced-motion` via the `useMotionPreference` hook.
-- **Accessibility:** Radix primitives provide focus trap, escape-close, and ARIA roles; the skip link in `apps/web/app/layout.tsx` is preserved; both themes are validated for WCAG AA contrast on text and interactive states.
-- **Hierarchy contract:** strong page headers (`components/page-header.tsx`), semantic KPI cards with sparklines and 24h deltas, consistent content rhythm on Tailwind's 4px spacing grid.
+- **Foundation:** Vite 6 + React 18 SPA in `web/` with Tailwind v3 (`web/tailwind.config.js`, HSL CSS-variable tokens declared in `web/src/index.css`) and shadcn/ui (New York, slate base) primitives in `web/src/components/ui/*`. The `cn` helper in `web/src/lib/utils.js` is the single class composer.
+- **Brand assets:** `web/src/components/site/GctlMark.jsx` ships an inline-SVG mark that adapts via `currentColor`. No raster brand assets in components.
+- **Color tokens (semantic, both themes):** the standard shadcn HSL palette — `background`, `foreground`, `card`, `popover`, `primary`, `secondary`, `muted`, `accent`, `destructive`, `border`, `input`, `ring`, plus `chart-1..5`. Tokens live in `web/src/index.css`. No hardcoded hex/rgba colors are allowed in components.
+- **Type & spacing:** the bundled `font-sans` + `font-serif` (system-derived) and `font-mono` for hashes/IDs. Spacing follows Tailwind's default 4px scale.
+- **Iconography & charts:** `lucide-react` is the canonical icon set; trust badges live in `web/src/components/trust/SourceBadge.jsx` + `FallbackBanner.jsx`. Trends use Recharts.
+- **Information architecture:** `/`, `/docs`, and `/concepts` are the public marketing site; everything operator-facing lives under `/dashboard`, `/policy-builder`, `/playground`, `/swarm`, `/alerting`, `/explorer`, `/team`, and `/onboarding`, all wrapped by `AppLayout`.
+- **App shell:** every operator screen renders inside `web/src/components/app/AppLayout.jsx` with a fixed side nav and `MobileNav` drawer on small viewports.
+- **Command palette:** `Ctrl/Cmd+K` opens `web/src/components/app/CommandPalette.jsx` (cmdk + shadcn).
+- **Routing:** react-router v6 (`BrowserRouter`) drives navigation; data fetching is `@tanstack/react-query` keyed on entity name.
+- **Auth:** the SPA ships with a default local admin operator (`web/src/api/gctlClient.js#auth`) so screens render without a remote login. Role swaps persist to `localStorage` for permission-aware UX.
+- **Motion:** framer-motion is available for subtle entrance animation; respect `prefers-reduced-motion` for any new motion.
+- **Accessibility:** Radix primitives provide focus trap, escape-close, and ARIA roles; both themes (default `dark` on `<html>`) are validated for WCAG AA contrast.
 - **Control contract:** shared button/input/select/table/checkbox/radio/switch/tabs/tooltip/popover/dialog/sheet/dropdown/command/scroll-area/slider/separator/skeleton primitives are mandatory for all routes; no raw browser-default form controls on primary flows.
-- **Evidence contract:** policy IDs, hashes, ENS subnames, attestations, and audit paths are rendered in monospace with `copy-text-button` affordances and `sonner` toast feedback (success + clipboard-failure paths covered).
-- **Data source contract:** whenever fallback snapshots are shown, pages must display explicit disclosure (`components/fallback-banner.tsx` with the diagonal stripe pattern + "Demo data" badge, plus per-row `Demo` chips on `source=fallback` rows) so synthetic data is never mistaken for live state.
+- **Evidence contract:** policy IDs, hashes, ENS subnames, attestations, and audit paths are rendered in monospace with copy affordances (`web/src/components/trust/IdentityEvidencePanel.jsx`).
+- **Data source contract:** whenever a `/api/ops/*` envelope reports `source: fallback`, pages must display `FallbackBanner` and a `SourceBadge` with the demo state so synthetic data is never mistaken for live state.
 
 ## Success metrics
 - **Activation:** first successful onboarding completion under 2 minutes.

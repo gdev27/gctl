@@ -22,8 +22,8 @@
 - Store audit log path and index into compliance API.
 
 ## Environment contract and startup checks
-1. Keep browser-exposed variables in `apps/web/.env.example` under `NEXT_PUBLIC_*`.
-2. Never place secret-like keys (`*_PRIVATE_KEY`, `*_TOKEN`, `*_SECRET`, `*_JWT`, `*_API_KEY`) in `NEXT_PUBLIC_*` namespace.
+1. Keep browser-exposed variables in `web/.env.example` under `VITE_*` (Vite's public namespace). Server-only secrets used by Vercel Functions live in the project-level Vercel env (e.g. `INDEXER_URL`, `OPENAI_API_KEY`, `FUND_ENS_NAME`) and must never appear under `VITE_*`.
+2. Never place secret-like keys (`*_PRIVATE_KEY`, `*_TOKEN`, `*_SECRET`, `*_JWT`, `*_API_KEY`) in the `VITE_*` namespace.
 3. Validate env contracts before judge/demo runs:
    - `npm run validate:env`
 6. Run full judge preflight before submission:

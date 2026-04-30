@@ -46,7 +46,7 @@ This creates autonomous behavior with governance boundaries, rather than static 
   - Test gate: `test/submissionTrustClaims.test.ts`
   - Preflight step: `test`
 - **No hardcoded demo trust identities (`INV-NOHARDCODE-001`):**
-  - Evidence: env-driven demo scripts + `apps/web/.env.example`
+  - Evidence: env-driven demo scripts + `web/.env.example`
   - Test gate: `test/submissionTrustClaims.test.ts`
   - Preflight step: `validate-env`
 - **KeeperHub workflow branch and traceability (`INV-WORKFLOW-001`, `INV-WORKFLOW-002`):**
@@ -58,9 +58,9 @@ This creates autonomous behavior with governance boundaries, rather than static 
   - Schema gate: `docs/evidence/schema/trust-evidence.schema.json`
   - Preflight step: `validate-evidence`
 - **API fallback/source disclosure (`INV-SOURCE-001`):**
-  - Evidence: Ops API trust envelope in `apps/web/app/api/ops/*`
-  - Test gate: `apps/web/lib/status.test.ts`
-  - Preflight steps: `web:typecheck`, `web:test` (captured via root preflight checks and local web checks)
+  - Evidence: Ops API trust envelope in `api/ops/*` and `api/_lib/data.js`
+  - Test gate: `web/src/api/gctlClient.js` `IndexerPolicyStore`/`IndexerTransactionStore` mappers + `api/_lib/data.js` envelope merge
+  - Preflight steps: `web:lint`, `web:build` (captured via root preflight checks)
 
 ## 0G tracks
 - Framework track: adapter-based framework and extension surfaces.
@@ -90,8 +90,9 @@ https://github.com/gdev27/gctl
 `Local CLI demo (deterministic + swarm) with artifacts in docs/evidence/`
 
 ## Frontend demo surface
-- `apps/web` ships an Ops UI with onboarding checks, policy explorer/authoring sandbox, run center, swarm role view, evidence center, and settings.
-- Frontend BFF endpoints (`/api/ops/*`) bridge indexer payloads into consumer-friendly dashboard contracts.
+- `web/` ships at https://gctl.vercel.app with the operator console: dashboard, agents, policy builder (with AI debate template generator), playground, swarm, alerting, explorer, team, and onboarding readiness.
+- Vercel Functions in `api/ops/*` bridge indexer payloads through a trust-enveloped (`source`/`trustStatus`/`reasonCode`/`recoveryAction`) contract; the SPA renders a `SourceBadge` and `FallbackBanner` whenever live telemetry is unavailable.
+- `api/functions/debate-policy.js` runs a Proposer → Critic → Synthesizer chain on `OPENAI_API_KEY` and falls back to a deterministic synthesizer otherwise.
 
 ## Demo video (under 3 minutes)
 `TBD - recording pending upload`

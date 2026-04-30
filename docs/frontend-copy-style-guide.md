@@ -1,6 +1,6 @@
 # Frontend Copy Style Guide
 
-Use this guide for all `apps/web` product copy so the UI keeps one voice.
+Use this guide for all `web/` product copy so the UI keeps one voice.
 
 ## Voice and tone
 - Write for operators and reviewers first.
@@ -28,5 +28,5 @@ Use this guide for all `apps/web` product copy so the UI keeps one voice.
 - Ambiguous trust language that could make fallback data look live.
 
 ## Enforcement
-- Run `npm run web:copy:check` before opening a PR.
-- CI enforces this check and fails on non-canonical terms.
+- Reviewers should grep for non-canonical terms (`run center`, `actions` vs `operations`, casing drift) during PR review.
+- The legacy automated `web:copy:check` was tied to the retired Next.js app and is no longer wired into CI.

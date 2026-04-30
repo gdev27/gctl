@@ -17,19 +17,16 @@ jobs:
         with:
           node-version: "22"
           cache: "npm"
-          cache-dependency-path: apps/web/package-lock.json
+          cache-dependency-path: web/package-lock.json
 
       - name: Install web dependencies
-        run: npm ci --prefix apps/web
+        run: npm ci --prefix web
 
       - name: Validate Vercel secrets
         run: |
           test -n "${{ secrets.VERCEL_TOKEN }}" || (echo "Missing VERCEL_TOKEN secret" && exit 1)
           test -n "${{ secrets.VERCEL_ORG_ID }}" || (echo "Missing VERCEL_ORG_ID secret" && exit 1)
           test -n "${{ secrets.VERCEL_PROJECT_ID }}" || (echo "Missing VERCEL_PROJECT_ID secret" && exit 1)
-
-      - name: Build web app
-        run: npm run web:build
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest

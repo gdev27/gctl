@@ -53,8 +53,8 @@ npm run demo:deterministic
 npm run demo:swarm
 npm run ens:passport
 npm run web:dev
+npm run web:lint
 npm run web:typecheck
-npm run web:test
 npm run web:build
 ```
 
@@ -105,7 +105,8 @@ npm run web:build
 - `keeperhub-workflows/`: workflow routing, execution, reconciliation, analytics.
 - `ens-identity/`: ENS metadata and role/subname management scripts.
 - `indexer/`: indexed state + compliance API scaffold.
-- `apps/web/`: Next.js frontend operations dashboard and BFF API routes.
+- `web/`: Vite + React 18 SPA shipped at https://gctl.vercel.app — the operator console, marketing site, and policy builder.
+- `api/`: Vercel Functions backing the SPA (`/api/ops/*` indexer trust envelope and `/api/functions/debate-policy` LLM-with-fallback policy synthesizer).
 - `scripts/`: deployment and deterministic/simulation demos.
 - `test/`: unit, integration, and failure-injection tests.
 - `examples/`: open-source reference scenarios and starter templates.

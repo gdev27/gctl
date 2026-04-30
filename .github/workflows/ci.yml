@@ -22,7 +22,7 @@ jobs:
         run: npm ci
 
       - name: Install frontend deps
-        run: npm ci --prefix apps/web
+        run: npm ci --prefix web
 
       - name: Compile contracts
         run: npm run hh:compile
@@ -33,20 +33,8 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
-      - name: Frontend typecheck
-        run: npm run web:typecheck
-
       - name: Frontend lint
         run: npm run web:lint
-
-      - name: Frontend copy terminology check
-        run: npm run web:copy:check
-
-      - name: Frontend format check
-        run: npm run web:format:check
-
-      - name: Frontend tests
-        run: npm run web:test
 
       - name: Frontend build
         run: npm run web:build

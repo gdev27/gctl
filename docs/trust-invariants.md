@@ -47,7 +47,7 @@ Each invariant includes:
 - **Proof path:**
   - `test/submissionTrustClaims.test.ts`
   - `.env.example`
-  - `apps/web/.env.example`
+  - `web/.env.example`
 
 ## INV-WORKFLOW-001 KeeperHub workflow branches are policy-derived
 
@@ -81,13 +81,15 @@ Each invariant includes:
 - **What must hold:** Ops BFF payloads include source semantics and trust status details so fallback data is never mistaken for live telemetry.
 - **Failure behavior:** Responses missing trust source metadata fail API contract tests.
 - **Proof path:**
-  - `apps/web/app/api/ops/_lib/data.ts`
-  - `apps/web/lib/api.ts`
-  - `apps/web/lib/status.test.ts`
+  - `api/_lib/data.js`
+  - `api/ops/*.js`
+  - `web/src/hooks/useOpsEnvelope.js`
+  - `web/src/components/trust/SourceBadge.jsx`, `web/src/components/trust/FallbackBanner.jsx`
+  - `test/submissionTrustClaims.test.ts`
 
 ## INV-ENV-001 Public and secret env boundaries are enforced
 
-- **What must hold:** Browser-exposed variables are restricted to `NEXT_PUBLIC_*`; private credentials must never be consumable from client env namespace.
+- **What must hold:** Browser-exposed variables are restricted to the `VITE_*` namespace consumed by `web/`; private credentials (Vercel Function env: `INDEXER_URL`, `OPENAI_API_KEY`, signing keys, etc.) must never be consumable from the client env namespace.
 - **Failure behavior:** Env contract validation fails startup/preflight.
 - **Proof path:**
   - `scripts/validateEnvContracts.ts`

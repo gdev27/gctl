@@ -86,7 +86,7 @@ describe("submission trust claims", () => {
       "scripts/demoDeterministic.ts",
       "scripts/demoSmallTrade.ts",
       "scripts/demoLargeTrade.ts",
-      "apps/web/app/api/ops/_lib/data.ts"
+      "api/_lib/data.js"
     ];
     const bannedLiterals = ["eurofund.eth", "algo1.eurofund.eth", "demo.gctl.eth"];
 

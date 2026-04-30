@@ -57,8 +57,8 @@ npm run judge:preflight
   - schema gate: `npm run validate:evidence`
   - evidence: `docs/evidence/trust-evidence.json` (`attestation`)
 - `INV-SOURCE-001` (source/trust envelope in ops APIs):
-  - tests: `apps/web/lib/status.test.ts`
-  - implementation: `apps/web/app/api/ops/_lib/data.ts`
+  - tests: `test/submissionTrustClaims.test.ts` (asserts `api/_lib/data.js` envelope shape + no hardcoded demo identities)
+  - implementation: `api/_lib/data.js`, `api/ops/*.js`, consumed by `web/src/api/gctlClient.js` and `web/src/hooks/useOpsEnvelope.js`
 
 ## Runtime + deployment evidence (paste links/paths)
 - Policy registry address + tx: `0x9eaB6ef0Cdd26363f0608DD0908adcf1BC0a4814` + `https://sepolia.basescan.org/tx/0x5c431661680dbf7c3ae26a3b5c88b8b5bb3570a0bdd333257fa712669c5bc540`

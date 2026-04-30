@@ -30,13 +30,10 @@
     "hh:compile": "hardhat compile",
     "hh:test": "hardhat test",
     "indexer:api": "tsx indexer/src/api.ts",
-    "web:dev": "npm --prefix apps/web run dev",
-    "web:build": "npm --prefix apps/web run build",
-    "web:typecheck": "npm --prefix apps/web run typecheck",
-    "web:test": "npm --prefix apps/web run test",
-    "web:lint": "npm --prefix apps/web run lint",
-    "web:format:check": "npm --prefix apps/web run format:check",
-    "web:copy:check": "tsx scripts/checkFrontendCopyTerms.ts"
+    "web:dev": "npm --prefix web run dev",
+    "web:build": "npm --prefix web run build",
+    "web:typecheck": "npm --prefix web run typecheck",
+    "web:lint": "npm --prefix web run lint"
   },
   "dependencies": {
     "ajv": "^8.20.0",
