@@ -7,6 +7,7 @@ import { DEFAULT_DISPLAY_MODE, DEFAULT_SESSION_VIEW } from "../lib/workspace";
 
 const MODE_KEY = "gctl.settings.mode";
 const SESSION_VIEW_KEY = "gctl.session.viewMode";
+const SESSION_CONTROLS_OPEN_KEY = "gctl.session.controlsOpen";
 const SETTINGS_UPDATED_EVENT = "gctl:settings-updated";
 
 export function SessionBanner() {
@@ -20,6 +21,12 @@ export function SessionBanner() {
   const [displayMode, setDisplayMode] = useState<DisplayMode>(DEFAULT_DISPLAY_MODE);
   const [announce, setAnnounce] = useState("");
   const [accountLabel, setAccountLabel] = useState("Guest workspace");
+  const [controlsOpen, setControlsOpen] = useState(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+    return window.localStorage.getItem(SESSION_CONTROLS_OPEN_KEY) === "true";
+  });
 
   useEffect(() => {
     function syncDisplayMode() {
@@ -58,6 +65,10 @@ export function SessionBanner() {
     void updateWorkspacePreferences({ sessionView: mode });
   }, [mode]);
 
+  useEffect(() => {
+    window.localStorage.setItem(SESSION_CONTROLS_OPEN_KEY, controlsOpen ? "true" : "false");
+  }, [controlsOpen]);
+
   const blurb =
     mode === "overview"
       ? "Overview view emphasizes plain-language summaries and top-level health."
@@ -73,21 +84,21 @@ export function SessionBanner() {
 
   return (
     <div className="session-banner row-between">
-      <div>
-        <strong>View preference: {mode}</strong>
-        <p className="muted">
-          Display mode preference from Settings:{" "}
-          {displayMode === "live" ? "Live-data wording" : "Demo-safe wording"}.
-        </p>
-        <p className="muted">Workspace: {accountLabel}</p>
-        <p className="muted">This changes presentation density and detail visibility only.</p>
-        <p className="muted mb-0">{blurb}</p>
-      </div>
-      <button type="button" className="btn" onClick={toggleMode}>
-        Switch to {mode === "overview" ? "investigation" : "overview"}
+      <button type="button" className="btn btn-sm" onClick={() => setControlsOpen((value) => !value)}>
+        {controlsOpen ? "Hide display controls" : "Display controls"}
       </button>
+      {controlsOpen ? (
+        <div className="row session-controls">
+          <span className="pill neutral">View: {mode}</span>
+          <span className="pill neutral">Mode: {displayMode === "live" ? "live" : "demo"}</span>
+          <span className="pill neutral">Workspace: {accountLabel}</span>
+          <button type="button" className="btn btn-sm" onClick={toggleMode}>
+            Switch to {mode === "overview" ? "investigation" : "overview"} view
+          </button>
+        </div>
+      ) : null}
       <span className="sr-only" aria-live="polite">
-        {announce}
+        {announce || blurb}
       </span>
     </div>
   );

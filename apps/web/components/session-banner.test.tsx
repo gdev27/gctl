@@ -3,6 +3,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SessionBanner } from "./session-banner";
 
 describe("SessionBanner", () => {
+  function clickLatestDisplayControls() {
+    const buttons = screen.getAllByRole("button", { name: /display controls/i });
+    const button = buttons.at(-1);
+    if (!button) {
+      throw new Error("Display controls button not found");
+    }
+    fireEvent.click(button);
+  }
+
   beforeEach(() => {
     vi.restoreAllMocks();
     window.localStorage.clear();
@@ -19,7 +28,8 @@ describe("SessionBanner", () => {
     window.localStorage.setItem("gctl.session.viewMode", "investigation");
     render(<SessionBanner />);
 
-    expect(screen.getByText(/View preference: investigation/i)).toBeInTheDocument();
+    clickLatestDisplayControls();
+    expect(screen.getByText(/View:\s*investigation/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /switch to overview/i }));
     expect(window.localStorage.getItem("gctl.session.viewMode")).toBe("overview");
   });
@@ -29,7 +39,8 @@ describe("SessionBanner", () => {
     render(<SessionBanner />);
     window.dispatchEvent(new Event("gctl:settings-updated"));
 
-    expect(screen.getByText(/Live-data wording/i)).toBeInTheDocument();
+    clickLatestDisplayControls();
+    expect(screen.getAllByText(/Mode:\s*live/i).length).toBeGreaterThan(0);
   });
 
   it("shows workspace owner when account session exists", async () => {
@@ -56,6 +67,7 @@ describe("SessionBanner", () => {
     );
     render(<SessionBanner />);
 
+    clickLatestDisplayControls();
     expect(await screen.findByText(/Workspace: Alicia/i)).toBeInTheDocument();
   });
 });

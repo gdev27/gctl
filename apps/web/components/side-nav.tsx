@@ -88,10 +88,7 @@ export function SideNav({
     >
       <div className="nav-header">
         <strong>gctl Control Plane</strong>
-        <p className="muted">
-          Policy-safe operations with clear evidence trails and connector health visibility.
-        </p>
-        <p className="muted mb-0">Shortcut: Ctrl/Cmd + K jumps to runs.</p>
+        <p className="muted mb-0">Ctrl/Cmd + K to open Runs</p>
       </div>
       <NavGroup title="Overview" links={overviewLinks} pathname={pathname} onClose={onClose} />
       <NavGroup title="Operations" links={operationsLinks} pathname={pathname} onClose={onClose} />

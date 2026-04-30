@@ -5,10 +5,18 @@ import { useRouter } from "next/navigation";
 import { SessionBanner } from "./session-banner";
 import { SideNav } from "./side-nav";
 
+const DESKTOP_NAV_COLLAPSED_KEY = "gctl.ui.desktopNavCollapsed";
+
 export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [navOpen, setNavOpen] = useState(false);
   const [isMobileLayout, setIsMobileLayout] = useState(false);
+  const [desktopNavCollapsed, setDesktopNavCollapsed] = useState(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+    return window.localStorage.getItem(DESKTOP_NAV_COLLAPSED_KEY) === "true";
+  });
 
   useEffect(() => {
     const media = window.matchMedia("(max-width: 980px)");
@@ -49,8 +57,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     };
   }, [navOpen]);
 
+  useEffect(() => {
+    window.localStorage.setItem(DESKTOP_NAV_COLLAPSED_KEY, desktopNavCollapsed ? "true" : "false");
+  }, [desktopNavCollapsed]);
+
   return (
-    <div className="layout">
+    <div className="layout" data-nav-collapsed={desktopNavCollapsed ? "true" : "false"}>
       <SideNav navOpen={navOpen} isMobileLayout={isMobileLayout} onClose={() => setNavOpen(false)} />
       {navOpen ? (
         <button
@@ -61,17 +73,26 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         />
       ) : null}
       <main className="shell" id="main-content">
-        <button
-          type="button"
-          className="btn mobile-nav-toggle"
-          onClick={() => setNavOpen((value) => !value)}
-          aria-expanded={navOpen}
-          aria-controls="primary-navigation"
-          aria-label={navOpen ? "Close navigation menu" : "Open navigation menu"}
-        >
-          <span aria-hidden="true">{navOpen ? "Close" : "Menu"}</span>
-          <span className="sr-only">{navOpen ? "Close menu" : "Open menu"}</span>
-        </button>
+        <div className="row shell-controls">
+          <button
+            type="button"
+            className="btn mobile-nav-toggle"
+            onClick={() => setNavOpen((value) => !value)}
+            aria-expanded={navOpen}
+            aria-controls="primary-navigation"
+            aria-label={navOpen ? "Close navigation menu" : "Open navigation menu"}
+          >
+            <span aria-hidden="true">{navOpen ? "Close" : "Menu"}</span>
+            <span className="sr-only">{navOpen ? "Close menu" : "Open menu"}</span>
+          </button>
+          <button
+            type="button"
+            className="btn btn-sm desktop-nav-toggle"
+            onClick={() => setDesktopNavCollapsed((value) => !value)}
+          >
+            {desktopNavCollapsed ? "Show sidebar" : "Hide sidebar"}
+          </button>
+        </div>
         <SessionBanner />
         {children}
       </main>

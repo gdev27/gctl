@@ -94,46 +94,14 @@ export default function DashboardPage() {
       <PageHeader
         eyebrow="Overview"
         title="Operations dashboard"
-        description="Track control-plane health, policy coverage, and latest outcomes before drilling into run evidence."
+        description="Track health, policy coverage, and latest run outcomes."
       />
 
       {dataSource === "fallback" ? (
         <FallbackBanner message="Fallback data active: live endpoints were unavailable, so this view is showing deterministic snapshots." />
       ) : null}
 
-      <article className="card feature-card">
-        <div className="row-between">
-          <div>
-            <h3>What gctl is for</h3>
-            <p className="muted mb-0">
-              gctl is a policy-constrained control plane for autonomous onchain workflows. It helps teams
-              prove decisions, monitor execution, and investigate evidence without digging through raw logs.
-            </p>
-          </div>
-          <Link href="/onboarding" className="btn btn-primary">
-            Start guided setup
-          </Link>
-        </div>
-        <p className="mt-2 mb-0">
-          <Link href="/about">Read full product guide</Link>
-        </p>
-        <div className="grid grid-3 mt-4">
-          <div className="card card-tight">
-            <p className="field-label">Step 1</p>
-            <p className="mb-0">Run readiness checks and verify indexer freshness.</p>
-          </div>
-          <div className="card card-tight">
-            <p className="field-label">Step 2</p>
-            <p className="mb-0">Connect identity, policy, and workflow infrastructure from Settings.</p>
-          </div>
-          <div className="card card-tight">
-            <p className="field-label">Step 3</p>
-            <p className="mb-0">Review runs, pin critical incidents, and drill into evidence records.</p>
-          </div>
-        </div>
-      </article>
-
-      <div className="grid grid-3">
+      <div className="grid grid-4">
         <article className="card feature-card kpi">
           <h3>Active policies</h3>
           <p className="kpi-value">{overview.activePolicies}</p>
@@ -152,17 +120,12 @@ export default function DashboardPage() {
             <Link href="/runs?status=denied">Review fail-closed runs</Link>
           </p>
         </article>
+        <article className="card feature-card kpi">
+          <h3>Success rate</h3>
+          <p className="kpi-value">{Math.round(overview.deterministicSuccessRate * 100)}%</p>
+          <p className="muted">Deterministic runs in latest observed period.</p>
+        </article>
       </div>
-
-      <article className="card">
-        <div className="row-between">
-          <div>
-            <h3>Deterministic success rate</h3>
-            <p className="muted">Last observed period from indexed workflow data.</p>
-          </div>
-          <span className="kpi-value">{Math.round(overview.deterministicSuccessRate * 100)}%</span>
-        </div>
-      </article>
 
       {loading ? (
         <article className="card" role="status" aria-live="polite">
