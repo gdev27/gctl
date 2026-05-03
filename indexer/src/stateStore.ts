@@ -2,7 +2,9 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { IndexState, initialIndexState } from "./schema";
 
-const DB_PATH = path.resolve("./indexer/index-state.json");
+const DB_PATH = process.env.INDEXER_STATE_PATH
+  ? path.resolve(process.env.INDEXER_STATE_PATH)
+  : path.resolve("./indexer/index-state.json");
 
 let loaded = false;
 let state: IndexState = {

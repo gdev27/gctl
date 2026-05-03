@@ -4,6 +4,10 @@ import { getIndexedStateSnapshot, initIndexedState } from "./stateStore";
 const app = express();
 app.use(express.json());
 
+app.get("/health", (_req: Request, res: Response) => {
+  res.status(200).json({ ok: true, service: "gctl-indexer" });
+});
+
 app.get("/fund/:ens/policies", async (_req: Request, res: Response) => {
   const state = await getIndexedStateSnapshot();
   res.json(Object.values(state.policies));
@@ -45,11 +49,12 @@ app.get("/alerts/fail-closed", async (_req: Request, res: Response) => {
   res.json(alerts);
 });
 
-const port = Number(process.env.INDEXER_PORT || 4300);
+const port = Number(process.env.PORT || process.env.INDEXER_PORT || 4300);
+const host = process.env.INDEXER_HOST || "0.0.0.0";
 
 void initIndexedState().then(() => {
-  app.listen(port, () => {
-    console.log(`Indexer API listening on ${port}`);
+  app.listen(port, host, () => {
+    console.log(`Indexer API listening on http://${host}:${port}`);
   });
 }).catch((error) => {
   console.error("Failed to initialize indexed state", error);

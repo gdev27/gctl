@@ -1,0 +1,28 @@
+# Fly.io config for the gctl indexer HTTP API.
+# First time: install https://fly.io/docs/hands-on/install-flyctl/ then from repo root:
+#   fly apps create YOUR_INDEXER_APP_NAME
+# Edit `app` below to match, then:
+#   fly deploy --config fly.indexer.toml
+#
+# After deploy, set in Vercel (Production):
+#   INDEXER_URL = https://YOUR_INDEXER_APP_NAME.fly.dev
+# (no trailing slash)
+
+app = "gctl-indexer"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile.indexer"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+[[vm]]
+  memory = "256mb"
+  cpu_kind = "shared"
+  cpus = 1

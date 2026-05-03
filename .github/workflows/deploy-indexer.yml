@@ -1,0 +1,72 @@
+# Deploy the gctl HTTP indexer to Fly.io (remote build — no local Docker).
+#
+# One-time (GitHub repo → Settings → Secrets and variables → Actions):
+#   FLY_API_TOKEN   — from `fly tokens create` (https://fly.io/docs/flyctl/tokens-create/)
+#   FLY_INDEXER_APP — globally unique app name, e.g. gctl-indexer-yourname
+#
+# Then: Actions → "Deploy gctl indexer (Fly.io)" → Run workflow.
+# Finally: Vercel → INDEXER_URL = https://<FLY_INDEXER_APP>.fly.dev (no trailing slash)
+
+name: Deploy gctl indexer (Fly.io)
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-indexer
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Validate secrets
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          FLY_INDEXER_APP: ${{ secrets.FLY_INDEXER_APP }}
+        run: |
+          set -e
+          if [ -z "${FLY_API_TOKEN:-}" ]; then
+            echo "::error::Missing secret FLY_API_TOKEN. Create: fly auth login && fly tokens create"
+            exit 1
+          fi
+          if [ -z "${FLY_INDEXER_APP:-}" ]; then
+            echo "::error::Missing secret FLY_INDEXER_APP. Use a globally unique name (e.g. gctl-indexer-yourname)."
+            exit 1
+          fi
+          if ! echo "$FLY_INDEXER_APP" | grep -qE '^[a-z][a-z0-9-]{1,50}$'; then
+            echo "::error::FLY_INDEXER_APP must be lowercase letters, digits, hyphens; start with a letter."
+            exit 1
+          fi
+
+      - name: Create Fly app if needed
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          FLY_INDEXER_APP: ${{ secrets.FLY_INDEXER_APP }}
+        run: flyctl apps create "$FLY_INDEXER_APP" 2>/dev/null || true
+
+      - name: Deploy (remote build)
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          FLY_INDEXER_APP: ${{ secrets.FLY_INDEXER_APP }}
+        run: flyctl deploy --config fly.indexer.toml --remote-only --app "$FLY_INDEXER_APP"
+
+      - name: Summary — set this on Vercel
+        env:
+          FLY_INDEXER_APP: ${{ secrets.FLY_INDEXER_APP }}
+        run: |
+          URL="https://${FLY_INDEXER_APP}.fly.dev"
+          {
+            echo "## Indexer deployed"
+            echo "Set **only** this on Vercel (Production + Preview if needed):"
+            echo ""
+            echo "| Name | Value |"
+            echo "|------|-------|"
+            echo "| \`INDEXER_URL\` | \`$URL\` |"
+            echo ""
+            echo "Health check: [$URL/health]($URL/health)"
+          } >> "$GITHUB_STEP_SUMMARY"

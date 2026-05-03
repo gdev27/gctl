@@ -26,9 +26,22 @@ The Vercel Functions in `api/ops/*` and `api/functions/debate-policy.js` only ru
 - `npm run web:build`
 - `npm run web:typecheck`
 
+## Live ops dashboard (Vercel + indexer)
+
+Ship the indexer with Docker and optional Fly.io — see **`indexer/README.md`** (includes `npm run indexer:docker:build`, `fly deploy --config fly.indexer.toml`, and wiring **`INDEXER_URL`** + **`FUND_ENS_NAME`** on Vercel).
+
+Populate the indexer’s backing store using your normal pipeline (demos, ingestion, etc.); empty responses still return live HTTP with empty arrays, while the Vercel layer may merge mock fallbacks when needed.
+
 ## API contract notes
 - Vercel Functions live under `api/ops/*` and `api/functions/*`.
 - `api/ops/*` reads the indexer (via `INDEXER_URL`) and normalizes operator-facing payloads.
 - If the indexer is unavailable, deterministic fallback data from `api/_lib/mock-data.js` is returned so demos remain inspectable.
 - Every payload includes the trust envelope: `source` (`live` | `fallback`), `trustStatus` (`healthy` | `degraded` | `fallback`), optional `reasonCode`, and optional `recoveryAction`.
 - The SPA renders `web/src/components/trust/SourceBadge.jsx` plus `FallbackBanner.jsx` whenever `trustStatus !== healthy`; this includes degraded live data and fallback demo data.
+
+### `POST /api/functions/debate-policy`
+
+- Body: `{ "useCase": string (≥5 chars), "openaiApiKey"?: string, "openaiModel"?: string }` (snake_case `openai_api_key` / `openai_model` is also accepted).
+- If `OPENAI_API_KEY` is set in Vercel env, the host key is used when the client omits `openaiApiKey`.
+- If the user supplies `openaiApiKey` in the Policy Builder dialog (BYOK), that key is used **only for that request** (not persisted server-side). Invalid keys are ignored and the flow falls back to env key or deterministic synthesis.
+- Do **not** expose `INDEXER_URL` or other server secrets via `VITE_*` or user-editable indexer URLs from the browser: arbitrary URLs from clients would create SSRF risk if proxied from Functions. Keep indexer configuration in Vercel env.

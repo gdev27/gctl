@@ -1,0 +1,78 @@
+# gctl indexer HTTP API
+
+Express service that exposes policy and workflow snapshots for the Vercel ops layer (`api/_lib/data.js` fetches `INDEXER_URL`).
+
+## Routes
+
+| Method | Path | Notes |
+|--------|------|--------|
+| GET | `/health` | Liveness |
+| GET | `/fund/:ens/policies` | JSON array |
+| GET | `/workflows` | JSON array |
+| GET | `/alerts/fail-closed` | Fail-closed subset |
+
+## Local
+
+```bash
+npm run indexer:api
+```
+
+Default: `http://localhost:4300` (`PORT` / `INDEXER_PORT` override).
+
+## State
+
+Snapshots use `indexer/index-state.json` by default, or **`INDEXER_STATE_PATH`** for a mounted file in Docker/Fly.
+
+---
+
+## Deploy to Fly.io (no local Docker)
+
+Fly builds the image remotely.
+
+### Option A — GitHub Actions (recommended)
+
+1. **Fly.io**: install [flyctl](https://fly.io/docs/hands-on/install-flyctl/) locally once, run `fly auth login`, then create a deploy token:
+   ```bash
+   fly tokens create
+   ```
+   Copy the token.
+
+2. **GitHub** (this repo → **Settings → Secrets and variables → Actions**):
+   - **`FLY_API_TOKEN`** — paste the token from step 1.
+   - **`FLY_INDEXER_APP`** — a **globally unique** app name (lowercase, hyphens), e.g. `gctl-indexer-yourname`.
+
+3. Push these workflow files to GitHub (merge to your default branch if required).
+
+4. **Actions** → **Deploy gctl indexer (Fly.io)** → **Run workflow**.
+
+5. **Vercel only** (your step): set **`INDEXER_URL`** = `https://<FLY_INDEXER_APP>.fly.dev` (no trailing slash). Redeploy the Vercel project.
+
+Health check: `https://<FLY_INDEXER_APP>.fly.dev/health`
+
+### Option B — Your machine (flyctl + login)
+
+From repo root:
+
+```bash
+chmod +x scripts/deploy-indexer.sh
+./scripts/deploy-indexer.sh YOUR_UNIQUE_APP_NAME
+```
+
+Windows (PowerShell):
+
+```powershell
+.\scripts\deploy-indexer.ps1 -AppName YOUR_UNIQUE_APP_NAME
+```
+
+### Option C — Docker on your machine
+
+```bash
+npm run indexer:docker:build
+docker run --rm -p 8080:8080 -e PORT=8080 gctl-indexer
+```
+
+---
+
+## After deploy
+
+An empty indexer returns `[]` for policies/workflows until you populate `index-state.json` (run demos locally, copy the file to a volume, or add ingestion later).
