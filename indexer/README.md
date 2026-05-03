@@ -31,11 +31,12 @@ Fly builds the image remotely.
 
 ### Option A — GitHub Actions (recommended)
 
-1. **Fly.io** (one-time on your laptop): install [flyctl](https://fly.io/docs/hands-on/install-flyctl/), run `fly auth login`, then:
+1. **Fly.io** (one-time on your laptop): install [flyctl](https://fly.io/docs/hands-on/install-flyctl/), run `fly auth login`, then create an **org** deploy token (CI must create apps; `fly tokens create deploy` without `-a` needs an existing app and fails with “Could not find App”):
    ```bash
-   fly tokens create
+   fly orgs list
+   fly tokens create org -o personal
    ```
-   Copy the token.
+   Replace `personal` with your org slug from `fly orgs list`. Copy the token.
 
 2. **GitHub** (repo → **Settings → Secrets and variables → Actions**): add **`FLY_API_TOKEN`** with that value.
 

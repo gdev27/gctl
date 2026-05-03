@@ -1,7 +1,8 @@
 # Deploy the gctl HTTP indexer to Fly.io (remote build — no local Docker).
 #
 # One-time: GitHub → Settings → Secrets → Actions → add FLY_API_TOKEN
-#   Create token: fly auth login && fly tokens create   (https://fly.io/docs/flyctl/tokens-create/)
+#   Create token: fly auth login && fly orgs list && fly tokens create org -o YOUR_ORG_SLUG
+#   (Use an org token for CI; `fly tokens create deploy` requires an existing app: -a APP_NAME.)
 #
 # Then: Actions → "Deploy gctl indexer (Fly.io)" → Run workflow → enter a globally unique app name.
 # Finally: Vercel → INDEXER_URL = https://<that-app-name>.fly.dev
