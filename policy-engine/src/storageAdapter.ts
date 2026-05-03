@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { ZeroGMemoryAdapter } from "../../agent-sdk/src/zeroG";
 import { hashPolicyGraph } from "./compiler";
 import { PolicyGraph } from "./types";
 
@@ -86,19 +87,43 @@ export class LocalFileAdapter implements PolicyStorageAdapter {
 }
 
 export class OGAdapter implements PolicyStorageAdapter {
-  constructor(private readonly fallback = new LocalFileAdapter()) {}
+  private readonly memory: ZeroGMemoryAdapter;
 
-  // Stub for MVP. Interface remains stable for swapping to real 0G APIs.
+  constructor(private readonly fallback = new LocalFileAdapter()) {
+    this.memory = new ZeroGMemoryAdapter();
+  }
+
   async saveGraph(policyId: string, graph: PolicyGraph): Promise<{ uri: string; hash: string }> {
-    const saved = await this.fallback.saveGraph(policyId, graph);
+    const graphHash = hashPolicyGraph(graph);
+    const saved = await this.memory.write({
+      namespace: "policy-graph",
+      key: policyId,
+      payload: {
+        graph: graph as unknown as Record<string, unknown>,
+        graphHash
+      },
+      encrypted: true,
+      createdAt: new Date().toISOString()
+    });
     return {
-      ...saved,
-      uri: saved.uri.replace("file://", "og://stub/")
+      uri: saved.uri,
+      hash: graphHash
     };
   }
 
   async loadGraph(policyId: string, options?: LoadGraphOptions): Promise<PolicyGraph> {
-    return this.fallback.loadGraph(policyId, options);
+    const envelope = await this.memory.read("policy-graph", policyId);
+    if (!envelope) {
+      return this.fallback.loadGraph(policyId, options);
+    }
+    const graph = envelope.payload.graph as unknown as PolicyGraph;
+    if (options?.verifyHash) {
+      const computedHash = hashPolicyGraph(graph);
+      if (computedHash.toLowerCase() !== options.verifyHash.toLowerCase()) {
+        throw new Error("policy_hash_mismatch");
+      }
+    }
+    return graph;
   }
 
   async readDailyNotional(policyId: string, day: string): Promise<number | undefined> {

@@ -2,7 +2,7 @@
 > gctl@1.0.0 ens:passport
 > tsx ens-identity/scripts/showIdentityPassport.ts
 
-◇ injected env (29) from .env // tip: ⌘ custom filepath { path: '/custom/path/.env' }
+◇ injected env (29) from .env // tip: ◈ encrypted .env [www.dotenvx.com]
 {
   "ensName": "gdev27.eth",
   "authorized": true,

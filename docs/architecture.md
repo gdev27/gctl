@@ -37,7 +37,7 @@ flowchart LR
 ## Trust boundaries
 - **Mainnet ENS** provides identity, role metadata, and authorization attestations.
 - **PolicyRegistry** anchors canonical policy hashes and active status.
-- **0G Storage memory** persists encrypted swarm context and execution artifacts.
+- **0G Storage memory** persists encrypted swarm context and execution artifacts. Optional remote indexer upload/download may load `@0gfoundation/0g-storage-ts-sdk` at runtime (not a root npm dependency); see [zerog-storage-sdk-peer.md](./zerog-storage-sdk-peer.md) and [zerog-storage-operators.md](./zerog-storage-operators.md).
 - **KeeperHub** executes policy-approved actions with run-level observability.
 - **PolicyClient is fail-closed**: dependency or verification failures default to deny.
 

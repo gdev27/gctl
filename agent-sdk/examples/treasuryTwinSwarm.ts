@@ -14,6 +14,10 @@ type SwarmObjective = {
   action: ActionRequest;
 };
 
+function memoryTier(uri: string): "local" | "remote" {
+  return uri.startsWith("og://storage/") ? "remote" : "local";
+}
+
 async function runTreasuryTwinSwarm(input: SwarmObjective): Promise<Record<string, unknown>> {
   const compute = new ZeroGComputeAdapter();
   const memory = new ZeroGMemoryAdapter();
@@ -38,7 +42,7 @@ async function runTreasuryTwinSwarm(input: SwarmObjective): Promise<Record<strin
     context: { draftPlan: planner.output, research: researcher.output, amount: input.action.amount }
   });
 
-  await memory.write({
+  const sharedMemory = await memory.write({
     namespace: "swarm-shared",
     key: "latest",
     encrypted: true,
@@ -51,12 +55,26 @@ async function runTreasuryTwinSwarm(input: SwarmObjective): Promise<Record<strin
     }
   });
 
+  const trustFootprint = {
+    ens: { requireVerifiedReverse: true },
+    compute: {
+      provider: planner.provider,
+      simulated: planner.provider.includes("simulated"),
+      verified: planner.verified && researcher.verified && critic.verified
+    },
+    memory: {
+      tier: memoryTier(sharedMemory.uri),
+      encryptedAtRest: true
+    }
+  };
+
   const passport = await ens.resolveIdentityPassport(input.executorEnsName);
   if (!passport.verifiedReverse) {
     return {
       allowed: false,
       reason: "reverse_resolution_not_verified",
-      passport
+      passport,
+      trustFootprint
     };
   }
 
@@ -66,7 +84,8 @@ async function runTreasuryTwinSwarm(input: SwarmObjective): Promise<Record<strin
       allowed: false,
       reason: "critic_rejected_plan",
       traces: { planner, researcher, critic },
-      passport
+      passport,
+      trustFootprint
     };
   }
 
@@ -81,7 +100,8 @@ async function runTreasuryTwinSwarm(input: SwarmObjective): Promise<Record<strin
     objective: input.objective,
     passport,
     traces: { planner, researcher, critic },
-    execution
+    execution,
+    trustFootprint
   };
 }
 

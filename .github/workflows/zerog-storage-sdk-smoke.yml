@@ -1,0 +1,25 @@
+name: 0G Storage SDK smoke
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 12 * * 1"
+
+jobs:
+  isolated-canonical-peers:
+    name: Isolated tree (ethers 6.13.1 + SDK)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: integrations/zerog-sdk-isolated
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: integrations/zerog-sdk-isolated/package-lock.json
+      - name: Install (canonical peer pairing)
+        run: npm ci
+      - name: Load smoke
+        run: node smoke.mjs

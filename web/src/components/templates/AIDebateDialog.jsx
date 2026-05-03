@@ -2,7 +2,9 @@ import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Sparkles, Bot, Scale, Gavel, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Sparkles, Bot, Scale, Gavel, Loader2, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { base44 } from "@/api/gctlClient";
 
@@ -21,13 +23,20 @@ const PRESETS = [
 
 export default function AIDebateDialog({ open, onOpenChange, onComplete }) {
   const [useCase, setUseCase] = React.useState("");
+  const [openaiKey, setOpenaiKey] = React.useState("");
+  const [openaiModel, setOpenaiModel] = React.useState("");
   const [running, setRunning] = React.useState(false);
   const [activeStage, setActiveStage] = React.useState(-1);
   const [error, setError] = React.useState(null);
 
   React.useEffect(() => {
     if (!open) {
-      setUseCase(""); setRunning(false); setActiveStage(-1); setError(null);
+      setUseCase("");
+      setOpenaiKey("");
+      setOpenaiModel("");
+      setRunning(false);
+      setActiveStage(-1);
+      setError(null);
     }
   }, [open]);
 
@@ -41,7 +50,14 @@ export default function AIDebateDialog({ open, onOpenChange, onComplete }) {
     }, 4500);
 
     try {
-      const res = await base44.functions.invoke("debate-policy", { useCase });
+      const payload = { useCase };
+      const k = openaiKey.trim();
+      if (k.length > 0) {
+        payload.openaiApiKey = k;
+        const m = openaiModel.trim();
+        if (m.length > 0) payload.openaiModel = m;
+      }
+      const res = await base44.functions.invoke("debate-policy", payload);
       clearInterval(stageTimer);
       setActiveStage(STAGES.length); // all done
       const template = res?.data?.template;
@@ -99,6 +115,37 @@ export default function AIDebateDialog({ open, onOpenChange, onComplete }) {
                 ))}
               </div>
             </div>
+            <Collapsible className="rounded-md border border-border bg-background/40">
+              <CollapsibleTrigger className="group flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground">
+                <span>Optional: your OpenAI key (BYOK)</span>
+                <ChevronDown className="h-4 w-4 shrink-0 transition-transform group-data-[state=open]:rotate-180" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="space-y-3 border-t border-border px-3 pb-3 pt-2">
+                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                  Sent only to this site&apos;s API over HTTPS for this run; not stored on the server. Leave empty to use the host&apos;s configured key, or deterministic output if none is set.
+                </p>
+                <div>
+                  <label className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">API key</label>
+                  <Input
+                    type="password"
+                    autoComplete="off"
+                    value={openaiKey}
+                    onChange={(e) => setOpenaiKey(e.target.value)}
+                    placeholder="sk-…"
+                    className="mt-1.5 font-mono text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">Model (optional)</label>
+                  <Input
+                    value={openaiModel}
+                    onChange={(e) => setOpenaiModel(e.target.value)}
+                    placeholder="gpt-4o-mini"
+                    className="mt-1.5 font-mono text-sm"
+                  />
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
             {error && (
               <div className="text-xs text-destructive font-mono p-2 rounded bg-destructive/5 border border-destructive/20">
                 {error}

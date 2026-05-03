@@ -34,17 +34,17 @@ gctl packages those guarantees as a reusable `PolicyGraph SDK` plus a flagship `
 2. The planner and researcher create a policy-aware proposal.
 3. The critic challenges the proposal and can veto unsafe paths.
 4. The policy engine evaluates deterministic constraints.
-5. ENS identity checks verify role and authority metadata.
-6. 0G adapters provide compute preflight, encrypted memory artifacts, and attestation mapping.
+5. ENS identity checks verify role and authority metadata, including fail-closed reverse verification for caller ENS names.
+6. 0G adapters provide compute preflight, encrypted-at-rest memory artifacts, optional SDK-backed storage retrieval, and simulated/onchain attestation mapping.
 7. KeeperHub routes approved actions through safe or escalated workflows and records run evidence.
 
 The key invariant: if identity, policy integrity, evidence, or execution dependencies cannot be trusted, gctl denies or degrades explicitly instead of pretending the path is healthy.
 
 ## Sponsor Alignment
 
-- **0G Framework, Tooling & Extensions:** adapter-based compute, storage, and chain attestation surfaces.
+- **0G Framework, Tooling & Extensions:** adapter-based compute, storage, and chain attestation surfaces with deterministic fallback and optional live 0G SDK paths.
 - **0G Autonomous Agents & Swarms:** planner, researcher, critic, and executor roles with shared memory and reflection.
-- **ENS Integration + Creative ENS:** identity passports, role/subname metadata, authorization, and reverse verification.
+- **ENS Integration + Creative ENS:** identity passports, role/subname metadata, authorization, execution-profile routing, and reverse verification.
 - **KeeperHub Best Use:** policy-derived workflow branches, retries, run logs, reconciliation, and analytics.
 
 See `docs/sponsor-mapping.md` for the full mapping.
@@ -102,6 +102,7 @@ The deterministic demo shows safe, escalated, and blocked policy branches in `do
 - Judge preflight report: `docs/evidence/judge-preflight-report.md`
 - ENS passport output: `docs/evidence/ens-passport.txt`
 - Architecture: `docs/architecture.md`
+- 0G storage SDK / Hardhat `ethers` peers: `docs/zerog-storage-sdk-peer.md`, operator env install: `docs/zerog-storage-operators.md`, workspace isolation options: `docs/workspace-isolation.md`
 - Security model: `docs/security-model.md`
 - Operations runbook: `docs/operations.md`
 - Video script: `docs/video-script.md`

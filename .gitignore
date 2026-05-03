@@ -1,19 +1,33 @@
+# Dependencies
 node_modules/
 web/node_modules/
+
+# Builds & TypeScript
 dist/
 web/dist/
-coverage/
-.env
-cache/
-artifacts/
-typechain-types/
 *.tsbuildinfo
+
+# Tests
+coverage/
+
+# Hardhat / Solidity
+artifacts/
+cache/
+typechain-types/
+
+# Local runtime & demos (paths may not exist until tooling runs)
+indexer/index-state.json
 policy-storage/
+policy-storage-test/
 reconciliation-logs/
 .zerog-memory/
-.cursor/
-.claude/
-indexer/index-state.json
 
-.vercel
+# Secrets & env overrides
+.env
 .env*.local
+
+# Hosting / link metadata
+.vercel
+
+# Cursor (local only)
+.cursor/

@@ -252,6 +252,63 @@ describe("policy client fail closed", () => {
     expect(passportSpy.mock.calls[0][1]).toBe(sharedResolver);
   });
 
+  it("fails closed when caller ENS reverse verification is not trusted", async () => {
+    const graph = compilePolicy(policy);
+    const policyHash = hashPolicyGraph(graph);
+
+    vi.spyOn(MainnetEnsResolver.prototype, "resolveFundMetadata").mockResolvedValue({
+      policyId: "policy-unverified-reverse",
+      policyRegistryAddress: "0x0000000000000000000000000000000000000001",
+      policyRegistryChainId: 84532,
+      executionProfile: "standard"
+    });
+    vi.spyOn(MainnetEnsResolver.prototype, "getResolver").mockResolvedValue({
+      address: "0x0000000000000000000000000000000000000002",
+      getText: vi.fn(async () => "ok")
+    } as any);
+    vi.spyOn(MainnetEnsResolver.prototype, "verifyAgentAuthorization").mockResolvedValue(true);
+    vi.spyOn(MainnetEnsResolver.prototype, "resolveIdentityPassport").mockResolvedValue({
+      ensName: "algo1.eurofund.eth",
+      walletAddress: "0x0000000000000000000000000000000000000001",
+      resolverAddress: "0x0000000000000000000000000000000000000002",
+      verifiedReverse: false,
+      role: "executor",
+      capabilities: ["execution"],
+      metadata: {}
+    });
+    vi.spyOn(EvmPolicyRegistryReader.prototype, "getPolicyMeta").mockResolvedValue({
+      hash: policyHash,
+      uri: "file://policy",
+      active: true
+    });
+
+    const client = new PolicyClient({
+      ensMainnetRpcUrl: "http://127.0.0.1:1",
+      l2RegistryRpcUrl: "http://127.0.0.1:1",
+      expectedRegistryChainId: 84532,
+      maxRetries: 0,
+      storage: {
+        saveGraph: async () => ({ uri: "file://x", hash: policyHash }),
+        loadGraph: async () => graph
+      }
+    });
+
+    const result = await client.planAction({
+      fundEnsName: "eurofund.eth",
+      callerEnsName: "algo1.eurofund.eth",
+      action: {
+        actionType: "swap",
+        assetIn: "EURC",
+        assetOut: "EURRWA",
+        amount: 1000
+      }
+    });
+
+    expect(result.plan.allowed).toBe(false);
+    expect(result.plan.reason).toBe("dependency_failure");
+    expect(result.plan.errorCode).toContain("ENS_REVERSE_VERIFICATION_FAILED");
+  });
+
   it("uses exponential retry backoff with jitter disabled", async () => {
     const resolveFundMetadata = vi
       .spyOn(MainnetEnsResolver.prototype, "resolveFundMetadata")

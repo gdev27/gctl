@@ -154,10 +154,28 @@ function deterministicTemplate(useCase) {
   };
 }
 
-async function callOpenAI(prompt, schema) {
-  const apiKey = process.env.OPENAI_API_KEY;
+/** Per-request key from the client (BYOK). Never logged or returned. */
+function normalizeClientOpenAiKey(raw) {
+  if (typeof raw !== "string") return null;
+  const k = raw.trim();
+  if (k.length < 20 || k.length > 512) return null;
+  if (!k.startsWith("sk-")) return null;
+  if (/[\s\r\n]/.test(k)) return null;
+  return k;
+}
+
+function normalizeClientOpenAiModel(raw) {
+  if (typeof raw !== "string") return null;
+  const m = raw.trim();
+  if (m.length < 2 || m.length > 64) return null;
+  if (!/^[a-zA-Z0-9._-]+$/.test(m)) return null;
+  return m;
+}
+
+async function callOpenAI(prompt, schema, creds = {}) {
+  const apiKey = creds.apiKey || process.env.OPENAI_API_KEY;
   if (!apiKey) return null;
-  const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
+  const model = creds.model || process.env.OPENAI_MODEL || "gpt-4o-mini";
   const messages = [
     {
       role: "system",
@@ -202,19 +220,19 @@ async function callOpenAI(prompt, schema) {
   return content;
 }
 
-async function llmDebate(useCase) {
+async function llmDebate(useCase, creds = {}) {
   const proposerPrompt =
     `Use case: "${useCase.trim()}".\n\n` +
     `Draft a sensible starting policy for an autonomous onchain agent. Cover per-tx caps, daily ` +
     `limits, allowed chains and tokens, and human-approval thresholds. Reply in 2-4 short paragraphs.`;
-  const proposerOut = await callOpenAI(proposerPrompt);
+  const proposerOut = await callOpenAI(proposerPrompt, undefined, creds);
   if (!proposerOut) return null;
 
   const criticPrompt =
     `Use case: "${useCase.trim()}".\n\nPROPOSER drafted:\n"""\n${proposerOut}\n"""\n\n` +
     `Push back on weak points (caps too generous, missing allowlists, insufficient approvals). ` +
     `End with bullet-list changes.`;
-  const criticOut = await callOpenAI(criticPrompt);
+  const criticOut = await callOpenAI(criticPrompt, undefined, creds);
   if (!criticOut) return null;
 
   const synthPrompt =
@@ -222,7 +240,7 @@ async function llmDebate(useCase) {
     `Produce the final balanced policy as JSON only. Numeric values must be plain numbers. ` +
     `Choose ONE category from: treasury, yield, payments, trading, experimental, observation, custom. ` +
     `Add 2-4 tags (lowercase). Set config.is_active to true. allowed_contracts may be an empty array.`;
-  const finalPolicy = await callOpenAI(synthPrompt, POLICY_JSON_SCHEMA);
+  const finalPolicy = await callOpenAI(synthPrompt, POLICY_JSON_SCHEMA, creds);
   if (!finalPolicy) return null;
 
   finalPolicy.config = finalPolicy.config || {};
@@ -278,9 +296,14 @@ export default async function handler(req, res) {
     res.status(400).json({ error: "Provide a use case description (at least 5 characters)." });
     return;
   }
+  const clientKey = normalizeClientOpenAiKey(body.openaiApiKey ?? body.openai_api_key);
+  const clientModel = normalizeClientOpenAiModel(body.openaiModel ?? body.openai_model);
+  const llmCreds = {};
+  if (clientKey) llmCreds.apiKey = clientKey;
+  if (clientModel) llmCreds.model = clientModel;
   let template;
   try {
-    template = (await llmDebate(useCase)) || deterministicTemplate(useCase);
+    template = (await llmDebate(useCase, llmCreds)) || deterministicTemplate(useCase);
   } catch (err) {
     console.error("debate-policy LLM failure, falling back to deterministic:", err?.message || err);
     template = deterministicTemplate(useCase);

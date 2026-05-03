@@ -39,6 +39,10 @@ Thanks for contributing to gctl.
 - Add one happy-path and one failure-path test for each adapter.
 - Document required env vars in `.env.example` and README.
 
+## 0G Storage SDK (optional)
+
+The official `@0gfoundation/0g-storage-ts-sdk` is **not** a root dependency because its `ethers` peer conflicts with Hardhat’s peer range. Default `npm install` stays clean; remote storage uses a runtime dynamic import. Operators and CI patterns are documented in [docs/zerog-storage-sdk-peer.md](docs/zerog-storage-sdk-peer.md) and [docs/zerog-storage-operators.md](docs/zerog-storage-operators.md). Optional manual Vitest load check: `GCTL_ZEROG_SDK_MANUAL_SMOKE=1 npm run test:zerog-sdk-legacy-smoke` (only after installing the SDK on a coherent tree; see docs).
+
 ## RFC process
 
 Use RFCs for major changes:

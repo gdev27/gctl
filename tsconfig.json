@@ -14,6 +14,7 @@
     "types": ["node", "vitest/globals", "mocha", "chai"]
   },
   "include": [
+    "types/**/*.d.ts",
     "hardhat.config.ts",
     "contracts/**/*.sol",
     "scripts/**/*.ts",

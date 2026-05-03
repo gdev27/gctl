@@ -2,5 +2,5 @@
 > gctl@1.0.0 hh:compile
 > hardhat compile
 
-◇ injected env (29) from .env // tip: ⌘ custom filepath { path: '/custom/path/.env' }
+◇ injected env (29) from .env // tip: ⌘ enable debugging { debug: true }
 No contracts to compile

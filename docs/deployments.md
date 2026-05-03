@@ -16,7 +16,7 @@ Use this as a final fill-in sheet before submission.
 
 ## Contracts
 - `PolicyRegistry`: `0x9eaB6ef0Cdd26363f0608DD0908adcf1BC0a4814`
-- `ExecutionAttestation` (if separated from registry): `n/a (chain attestation currently uses adapter receipt path)`
+- `ExecutionAnchor` (optional 0G onchain attestation): n/a in current deterministic run. To enable live 0G anchoring, deploy `contracts/ExecutionAnchor.sol` and set `ZEROG_ATTESTATION_MODE=onchain`.
 - Optional ERC-8004 registry: `n/a (not configured in this workspace)`
 
 ## Deployment transactions
@@ -39,13 +39,15 @@ Use this as a final fill-in sheet before submission.
 
 ## Policy URI requirements
 - `PolicyMeta.uri` resolves to immutable content-addressed artifacts.
-- For local development this may be `file://...` or `og://stub/...`.
-- For production, replace stub URIs with CID-backed identifiers (or an equivalent tamper-evident URI scheme).
+- For local development this may be `file://...` or `og://local/...`.
+- When `POLICY_STORAGE_ADAPTER=og` and 0G storage credentials are configured, policy graphs use the same indexed 0G memory path as swarm and execution artifacts.
+- For production, replace local URIs with 0G storage roots, CID-backed identifiers, or an equivalent tamper-evident URI scheme.
 
 ## Demo ENS names
-- Fund ENS: `vitalik.eth`
-- Executor ENS: `vitalik.eth`
-- Role ENS (swarm): `vitalik.eth`, `vitalik.eth`, `vitalik.eth`, `vitalik.eth`
+- Fund ENS: use a fund/control-plane name, for example `fund.gctl.eth`
+- Executor ENS: use a distinct authorized agent name, for example `executor.gctl.eth`
+- Role ENS (swarm): use distinct role names such as `planner.gctl.eth`, `researcher.gctl.eth`, `critic.gctl.eth`, `executor.gctl.eth`
+- Deterministic local demos remain env-driven; live judging should verify each role's forward/reverse ENS linkage.
 
 ## Dry-run notes
 - `npm run demo:deterministic` and `npm run demo:swarm` pass in deterministic mode.

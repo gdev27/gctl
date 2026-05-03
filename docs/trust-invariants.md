@@ -27,9 +27,10 @@ Each invariant includes:
 ## INV-ENS-001 ENS identity passport uses reverse verification
 
 - **What must hold:** Agent passport resolution verifies ENS forward and reverse linkage for identity confidence.
-- **Failure behavior:** Authorization confidence is reduced and operations requiring trusted identity deny.
+- **Failure behavior:** Authorization confidence is reduced and operations requiring trusted identity deny. When a `callerEnsName` is supplied to the primary planning path, `PolicyClient.planAction` fails closed if reverse verification is not trusted.
 - **Proof path:**
   - `test/ensIdentityPassport.test.ts`
+  - `test/policyClient.failClosed.test.ts`
   - `docs/evidence/ens-passport.txt`
 
 ## INV-ENS-002 ENS role and capability metadata is structured and present

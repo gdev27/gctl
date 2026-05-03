@@ -60,6 +60,10 @@ function getPolicyClient(): PolicyClient {
   return sharedPolicyClient;
 }
 
+function memoryTier(uri: string): "local" | "remote" {
+  return uri.startsWith("og://storage/") ? "remote" : "local";
+}
+
 export async function runPolicyAndWorkflow(input: {
   fundEnsName: string;
   callerEnsName?: string;
@@ -114,8 +118,33 @@ export async function runPolicyAndWorkflow(input: {
     intentProof
   });
 
+  const preExecutionTrustFootprint = {
+    ens: { requireVerifiedReverse: Boolean(input.callerEnsName) },
+    compute: {
+      provider: preflight.provider,
+      simulated: preflight.provider.includes("simulated"),
+      verified: preflight.verified
+    },
+    memory: {
+      tier: memoryTier(preflightMemory.uri),
+      encryptedAtRest: true
+    }
+  };
+
   if (!planned.plan.allowed || !planned.policyId) {
-    return planned;
+    return {
+      ...planned,
+      computePreflight: {
+        provider: preflight.provider,
+        model: preflight.model,
+        requestId: preflight.requestId,
+        verified: preflight.verified
+      },
+      memoryArtifacts: {
+        preflight: preflightMemory
+      },
+      trustFootprint: preExecutionTrustFootprint
+    };
   }
 
   const workflow = buildWorkflowFromPlan(planned.plan, {
@@ -194,6 +223,19 @@ export async function runPolicyAndWorkflow(input: {
         execution: executionMemory
       },
       chainAttestation: attestation,
+      trustFootprint: {
+        ...preExecutionTrustFootprint,
+        memory: {
+          tier:
+            memoryTier(preflightMemory.uri) === "remote" || memoryTier(executionMemory.uri) === "remote"
+              ? "remote"
+              : "local",
+          encryptedAtRest: true
+        },
+        attestation: {
+          kind: attestation.kind
+        }
+      },
       intentProofIncluded: Boolean(intentProof),
       workflowId,
       runId,

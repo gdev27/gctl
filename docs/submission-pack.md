@@ -69,7 +69,8 @@ npm run web:build
 
 ## Runtime + deployment evidence (paste links/paths)
 - Policy registry address + tx: `0x9eaB6ef0Cdd26363f0608DD0908adcf1BC0a4814` + `https://sepolia.basescan.org/tx/0x5c431661680dbf7c3ae26a3b5c88b8b5bb3570a0bdd333257fa712669c5bc540`
-- 0G attestation evidence: `docs/evidence/trust-evidence.json` (`attestation`, simulated adapter receipt path in current judging run)
+- 0G attestation evidence: `docs/evidence/trust-evidence.json` (`attestation`, `kind=simulated` in the deterministic judging run; `kind=onchain` requires `ZEROG_ATTESTATION_MODE=onchain` and a deployed `ExecutionAnchor`)
+- 0G official storage SDK vs Hardhat `ethers` peers (optional runtime import): `docs/zerog-storage-sdk-peer.md`, `docs/zerog-storage-operators.md`, CI smoke: `.github/workflows/zerog-storage-sdk-smoke.yml`
 - ENS passport output: `docs/evidence/ens-passport.txt`
 - KeeperHub execution evidence: `demo runs now produce workflowId/runId and succeeded reconciliation states (see docs/evidence/demo-deterministic.json and docs/evidence/demo-swarm.json)`
 - Preflight report (markdown): `docs/evidence/judge-preflight-report.md`
@@ -88,9 +89,11 @@ npm run web:build
 - Deterministic flow:
   - `plan.pathType`, `plan.route`, `workflowId`, `runId`, `reconciliationState`
   - `computePreflight`, `memoryArtifacts`, `chainAttestation`
+  - `trustFootprint` (`ens`, `compute`, `memory`, `attestation` when execution reaches anchoring)
 - Swarm flow:
   - `passport`, `traces.planner`, `traces.researcher`, `traces.critic`
   - final `execution` object
+  - `trustFootprint` (`ens`, `compute`, `memory`)
 
 ## Final artifact pointers (fill before submit)
 - Deterministic safe/escalated/blocked branches: `docs/evidence/demo-deterministic.json` (single consolidated artifact)

@@ -46,6 +46,7 @@ export type PolicyClientOptions = {
   retryJitterRatio?: number;
   notionalCacheMaxEntries?: number;
   notionalCacheTtlMs?: number;
+  allowUnverifiedReverse?: boolean;
 };
 
 export class PolicyClient {
@@ -205,6 +206,9 @@ export class PolicyClient {
         identityPassport = await this.retry(() =>
           resolver.resolveIdentityPassport(input.callerEnsName as string, agentResolver)
         );
+        if (!this.opts.allowUnverifiedReverse && !identityPassport.verifiedReverse) {
+          return failClosed("ENS_REVERSE_VERIFICATION_FAILED", input.callerEnsName);
+        }
       }
 
       const l2Provider = this.getL2Provider();

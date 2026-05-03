@@ -2,7 +2,7 @@
 > gctl@1.0.0 demo:swarm
 > tsx agent-sdk/examples/treasuryTwinSwarm.ts
 
-◇ injected env (29) from .env // tip: ◈ secrets for agents [www.dotenvx.com]
+◇ injected env (29) from .env // tip: ⌘ override existing { override: true }
 {
   "allowed": true,
   "objective": "Rebalance treasury into compliant risk-adjusted position",
@@ -29,7 +29,7 @@
       "output": "[simulated-planner] objective=Create policy-compliant plan for: Rebalance treasury into compliant risk-adjusted position",
       "provider": "0g-compute-simulated",
       "model": "qwen3.6-plus",
-      "requestId": "d91ee308-368f-4858-b3a2-9d51384f9903",
+      "requestId": "7d8de3fe-e2ef-47be-b89a-2b5b1c6870ef",
       "verified": true,
       "raw": {
         "context": {
@@ -48,7 +48,7 @@
       "output": "[simulated-researcher] objective=Add market and liquidity context for proposed action",
       "provider": "0g-compute-simulated",
       "model": "qwen3.6-plus",
-      "requestId": "50e609f2-3955-4750-860d-76c2a1883790",
+      "requestId": "5a5e481a-f7a0-4d7e-8349-4ef252db854e",
       "verified": true,
       "raw": {
         "context": {
@@ -67,7 +67,7 @@
       "output": "[simulated-critic] objective=Challenge the plan and flag policy or execution risks",
       "provider": "0g-compute-simulated",
       "model": "qwen3.6-plus",
-      "requestId": "0b16d8be-4b99-47d8-8ce1-e5e3e9d19544",
+      "requestId": "35bbcae9-2a36-4589-ba60-dfeda82300a1",
       "verified": true,
       "raw": {
         "context": {
@@ -126,10 +126,50 @@
           {
             "check": "limits.daily",
             "passed": false,
-            "detail": "2110000"
+            "detail": "2120000"
           }
         ]
       }
+    },
+    "computePreflight": {
+      "provider": "0g-compute-simulated",
+      "model": "qwen3.6-plus",
+      "requestId": "ccfbc403-98c1-486e-aaf7-f42f5ea58617",
+      "verified": true
+    },
+    "memoryArtifacts": {
+      "preflight": {
+        "uri": "og://local/19128e9859f0cf8f71e3cda430b7688da25b5a5b772d96d807e9d7ccb00d4c5a",
+        "hash": "19128e9859f0cf8f71e3cda430b7688da25b5a5b772d96d807e9d7ccb00d4c5a"
+      }
+    },
+    "trustFootprint": {
+      "ens": {
+        "requireVerifiedReverse": true
+      },
+      "compute": {
+        "provider": "0g-compute-simulated",
+        "simulated": true,
+        "verified": true
+      },
+      "memory": {
+        "tier": "local",
+        "encryptedAtRest": true
+      }
+    }
+  },
+  "trustFootprint": {
+    "ens": {
+      "requireVerifiedReverse": true
+    },
+    "compute": {
+      "provider": "0g-compute-simulated",
+      "simulated": true,
+      "verified": true
+    },
+    "memory": {
+      "tier": "local",
+      "encryptedAtRest": true
     }
   }
 }

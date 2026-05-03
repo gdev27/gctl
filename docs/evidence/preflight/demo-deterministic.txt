@@ -2,7 +2,7 @@
 > gctl@1.0.0 demo:deterministic
 > tsx scripts/demoDeterministic.ts
 
-◇ injected env (29) from .env // tip: ◈ encrypted .env [www.dotenvx.com]
+◇ injected env (29) from .env // tip: ⌘ enable debugging { debug: true }
 {
   "mode": "deterministic-demo",
   "timestamp": "2026-01-01T00:00:00.000Z",
@@ -33,12 +33,10 @@
       }
     },
     "plan": {
-      "allowed": true,
-      "route": "public",
-      "dex": "COWSWAP",
-      "pathType": "batch-auction",
-      "shouldReport": false,
+      "allowed": false,
+      "reason": "daily_notional_exceeded",
       "killSwitchActive": false,
+      "shouldReport": true,
       "trace": {
         "steps": [
           {
@@ -55,22 +53,8 @@
           },
           {
             "check": "limits.daily",
-            "passed": true
-          },
-          {
-            "check": "routing.path",
-            "passed": true,
-            "detail": "batch-auction:COWSWAP"
-          },
-          {
-            "check": "privacy.route",
-            "passed": true,
-            "detail": "public"
-          },
-          {
-            "check": "reporting",
-            "passed": true,
-            "detail": "false"
+            "passed": false,
+            "detail": "2005000"
           }
         ]
       }
@@ -78,30 +62,29 @@
     "computePreflight": {
       "provider": "0g-compute-simulated",
       "model": "qwen3.6-plus",
-      "requestId": "2f180bcb-8c3a-46eb-bd7a-2e3b88ee63c3",
+      "requestId": "0079434b-fb21-4271-9d47-101641df290c",
       "verified": true
     },
     "memoryArtifacts": {
       "preflight": {
-        "uri": "og://local/1d1d10615141932631690fa4720ed843e4d510e73f6d4f5b6bbbfe778468135a",
-        "hash": "1d1d10615141932631690fa4720ed843e4d510e73f6d4f5b6bbbfe778468135a"
-      },
-      "execution": {
-        "uri": "og://local/0581656e6e8fe94327e6e436b09f9bcf9af39fe7facb452891c03c04a985eb71",
-        "hash": "0581656e6e8fe94327e6e436b09f9bcf9af39fe7facb452891c03c04a985eb71"
+        "uri": "og://local/2e2e7d059fa7ceb57091e1d75a2d4495bed5913e8de537bd961d6be77996303f",
+        "hash": "2e2e7d059fa7ceb57091e1d75a2d4495bed5913e8de537bd961d6be77996303f"
       }
     },
-    "chainAttestation": {
-      "chainId": 16602,
-      "txHash": "0x45b0e3c5f7b4bd8f0fee6d24142fcb9462f1c87149a9797abd5fcb67fe7eca6b",
-      "attestationId": "45b0e3c5f7b4bd8f0fee6d24142fcb9462f1c87149a9797abd5fcb67fe7eca6b"
-    },
-    "intentProofIncluded": true,
-    "workflowId": "l1tb320sjdooznhgfm97o",
-    "runId": "x94sy0cfw3fdw00nxw0hm",
-    "reconciliationState": "succeeded",
-    "auditPath": "C:\\Users\\gd27t\\Downloads\\gctl\\reconciliation-logs\\x94sy0cfw3fdw00nxw0hm.json",
-    "runLogCount": 0
+    "trustFootprint": {
+      "ens": {
+        "requireVerifiedReverse": true
+      },
+      "compute": {
+        "provider": "0g-compute-simulated",
+        "simulated": true,
+        "verified": true
+      },
+      "memory": {
+        "tier": "local",
+        "encryptedAtRest": true
+      }
+    }
   },
   "large": {
     "policyId": "0x784465e5240990461301aeaae5c627480543bd04b1835d780dc7df22ff7d7dfc",
@@ -151,9 +134,35 @@
           {
             "check": "limits.daily",
             "passed": false,
-            "detail": "2235000"
+            "detail": "2245000"
           }
         ]
+      }
+    },
+    "computePreflight": {
+      "provider": "0g-compute-simulated",
+      "model": "qwen3.6-plus",
+      "requestId": "ba4bcc12-0942-4a95-9209-fdd545891820",
+      "verified": true
+    },
+    "memoryArtifacts": {
+      "preflight": {
+        "uri": "og://local/63c9ca41de0246e7d87bf0ec80411e55ba5a353b568f2d4bb2f26c3cf94c024f",
+        "hash": "63c9ca41de0246e7d87bf0ec80411e55ba5a353b568f2d4bb2f26c3cf94c024f"
+      }
+    },
+    "trustFootprint": {
+      "ens": {
+        "requireVerifiedReverse": true
+      },
+      "compute": {
+        "provider": "0g-compute-simulated",
+        "simulated": true,
+        "verified": true
+      },
+      "memory": {
+        "tier": "local",
+        "encryptedAtRest": true
       }
     }
   }

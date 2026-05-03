@@ -35,9 +35,12 @@ export type ChainAttestationInput = {
 };
 
 export type ChainAttestationReceipt = {
+  kind: "simulated" | "onchain";
   chainId: number;
-  txHash: string;
+  txHash?: string;
   attestationId: string;
+  receipt: string;
+  explorerUrl?: string;
 };
 
 export type AgentIdentityProfile = {
