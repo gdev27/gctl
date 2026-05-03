@@ -1,0 +1,11 @@
+# Optional: deploy the ops indexer on Render (free tier).
+# Dashboard: New → Blueprint → paste this repo, or create Web Service manually (see indexer/README.md).
+services:
+  - type: web
+    name: gctl-indexer
+    runtime: docker
+    branch: main
+    dockerfilePath: ./Dockerfile.indexer
+    dockerContext: .
+    healthCheckPath: /health
+    plan: free
