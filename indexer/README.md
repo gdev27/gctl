@@ -25,6 +25,30 @@ Snapshots use `indexer/index-state.json` by default, or **`INDEXER_STATE_PATH`**
 
 ---
 
+## Deploy on Render (free tier, no Fly billing)
+
+Use this if you want a **real `INDEXER_URL`** without Fly. Tradeoffs: **cold starts** after idle, **free tier limits** — fine for demos.
+
+### Dashboard (what to change on the “Configure” screen)
+
+1. **Name:** use something like **`gctl-indexer`** (not `gctl`) so it’s obvious this service is only the indexer API.
+2. **Language / runtime:** change **Node** → **Docker** (Render’s docs: set language to Docker even if the app is Node inside the image).
+3. **Dockerfile path:** `Dockerfile.indexer` (repo root).
+4. **Branch:** `main` (or your default branch).
+5. Scroll to **Instance type** → choose **Free**.
+6. **Advanced** → **Health check path:** `/health`.
+7. Create / deploy and wait until **Live**. Your base URL will look like `https://gctl-indexer.onrender.com` (exact host is on the service page).
+
+### Vercel
+
+Set **`INDEXER_URL`** to that **https origin** (no trailing slash), e.g. `https://gctl-indexer.onrender.com`. Set **`FUND_ENS_NAME`** if needed. Redeploy Vercel.
+
+### Blueprint (optional)
+
+Repo root **`render.yaml`** defines the same Docker web service; you can apply it from Render as a **Blueprint** if you prefer infrastructure-as-code.
+
+---
+
 ## Deploy to Fly.io (no local Docker)
 
 Fly builds the image remotely.
