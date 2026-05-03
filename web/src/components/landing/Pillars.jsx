@@ -1,5 +1,5 @@
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Shield, Zap, Eye, GitBranch } from "lucide-react";
 
 const pillars = [
@@ -26,6 +26,8 @@ const pillars = [
 ];
 
 export default function Pillars() {
+  const reduceMotion = useReducedMotion() === true;
+
   return (
     <section className="relative max-w-7xl mx-auto px-6 lg:px-8 py-32">
       <div className="max-w-2xl mb-16">
@@ -39,9 +41,13 @@ export default function Pillars() {
         {pillars.map((p, i) => (
           <motion.div
             key={p.title}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
+            {...(reduceMotion
+              ? { initial: false, animate: { opacity: 1, y: 0 } }
+              : {
+                  initial: { opacity: 0, y: 20 },
+                  whileInView: { opacity: 1, y: 0 },
+                  viewport: { once: true, amount: 0.15, margin: "0px 0px 120px 0px" },
+                })}
             transition={{ duration: 0.5, delay: i * 0.07 }}
             className="bg-card p-8 group hover:bg-accent/30 transition-colors"
           >

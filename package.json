@@ -39,7 +39,8 @@
     "web:lint": "npm --prefix web run lint",
     "web:logo-512": "node scripts/render-favicon-512.mjs",
     "web:cover-640": "node scripts/render-cover-640.mjs",
-    "ui:sweep:prod": "node scripts/ui-sweep-prod.mjs"
+    "ui:sweep:prod": "node scripts/ui-sweep-prod.mjs",
+    "web:screenshots": "node scripts/capture-project-screenshots.mjs"
   },
   "dependencies": {
     "ajv": "^8.20.0",

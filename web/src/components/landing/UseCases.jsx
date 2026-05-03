@@ -1,5 +1,5 @@
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 const cases = [
   { title: "Treasury rebalancing", body: "Keep portfolio splits within a band, capped per tx, approval-gated above threshold." },
@@ -11,6 +11,8 @@ const cases = [
 ];
 
 export default function UseCases() {
+  const reduceMotion = useReducedMotion() === true;
+
   return (
     <section className="max-w-7xl mx-auto px-6 lg:px-8 py-32">
       <div className="max-w-2xl mb-16">
@@ -24,9 +26,13 @@ export default function UseCases() {
         {cases.map((c, i) => (
           <motion.div
             key={c.title}
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
+            {...(reduceMotion
+              ? { initial: false, animate: { opacity: 1, y: 0 } }
+              : {
+                  initial: { opacity: 0, y: 16 },
+                  whileInView: { opacity: 1, y: 0 },
+                  viewport: { once: true, amount: 0.12, margin: "0px 0px 100px 0px" },
+                })}
             transition={{ duration: 0.45, delay: i * 0.05 }}
             className="rounded-lg border border-border bg-card/40 p-6 hover:border-primary/30 hover:bg-card transition-all"
           >

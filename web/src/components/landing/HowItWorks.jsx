@@ -1,5 +1,5 @@
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 const steps = [
   {
@@ -31,6 +31,8 @@ agent.wallet = wallet`,
 ];
 
 export default function HowItWorks() {
+  const reduceMotion = useReducedMotion() === true;
+
   return (
     <section className="relative border-y border-border bg-card/20">
       <div className="absolute inset-0 grid-bg-fine opacity-30 pointer-events-none" />
@@ -46,9 +48,13 @@ export default function HowItWorks() {
           {steps.map((s, i) => (
             <motion.div
               key={s.num}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
+              {...(reduceMotion
+                ? { initial: false, animate: { opacity: 1, y: 0 } }
+                : {
+                    initial: { opacity: 0, y: 20 },
+                    whileInView: { opacity: 1, y: 0 },
+                    viewport: { once: true, amount: 0.12, margin: "0px 0px 140px 0px" },
+                  })}
               transition={{ duration: 0.6, delay: i * 0.1 }}
               className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
             >

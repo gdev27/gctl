@@ -1,11 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Hero() {
   const [copied, setCopied] = React.useState(false);
+  const reduceMotion = useReducedMotion() === true;
 
   const copyInstall = () => {
     navigator.clipboard.writeText("npm install @gctl/core");
@@ -21,9 +22,13 @@ export default function Hero() {
 
       <div className="relative max-w-7xl mx-auto px-6 lg:px-8 pt-40 pb-24">
         <motion.h1
-          initial={{ opacity: 0, y: 16 }}
+          initial={reduceMotion ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
+          transition={
+            reduceMotion
+              ? { duration: 0 }
+              : { duration: 0.7, delay: 0.05, ease: [0.22, 1, 0.36, 1] }
+          }
           className="text-balance font-serif text-5xl md:text-7xl lg:text-8xl leading-[0.95] tracking-tight max-w-5xl"
         >
           Autonomous agents that move value{" "}
@@ -31,9 +36,9 @@ export default function Hero() {
         </motion.h1>
 
         <motion.p
-          initial={{ opacity: 0, y: 12 }}
+          initial={reduceMotion ? false : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.15 }}
+          transition={reduceMotion ? { duration: 0 } : { duration: 0.7, delay: 0.15 }}
           className="mt-8 max-w-2xl text-lg text-muted-foreground leading-relaxed"
         >
           gctl is an open-source framework for building policy-constrained autonomous agents
@@ -41,9 +46,9 @@ export default function Hero() {
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={reduceMotion ? false : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.25 }}
+          transition={reduceMotion ? { duration: 0 } : { duration: 0.7, delay: 0.25 }}
           className="mt-10 flex flex-col sm:flex-row items-start sm:items-center gap-4"
         >
           <Link to="/docs">
@@ -63,18 +68,18 @@ export default function Hero() {
           </button>
         </motion.div>
 
-        <HeroVisual />
+        <HeroVisual reduceMotion={reduceMotion} />
       </div>
     </section>
   );
 }
 
-function HeroVisual() {
+function HeroVisual({ reduceMotion }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
+      initial={reduceMotion ? false : { opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.9, delay: 0.4 }}
+      transition={reduceMotion ? { duration: 0 } : { duration: 0.9, delay: 0.4 }}
       className="mt-20 relative"
     >
       <div className="rounded-xl border border-border bg-card/60 backdrop-blur overflow-hidden shadow-2xl shadow-black/40">
