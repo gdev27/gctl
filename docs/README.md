@@ -29,9 +29,9 @@ If you change behavior, contracts, or env semantics, update the **build** doc fi
 
 ### I am operating or integrating gctl
 
-1. [`operations.md`](./operations.md) — env contracts, pause/rotate, preflight  
+1. [`operations.md`](./operations.md) — day-one path, env contracts, pause/rotate, preflight  
 2. [`deployments.md`](./deployments.md) — networks, contract addresses, explorer links  
-3. [`security-model.md`](./security-model.md) — roles, pause semantics, audit privacy  
+3. [`security-model.md`](./security-model.md) — threat overview, roles, pause semantics, audit privacy  
 4. [`frontend-product-contract.md`](./frontend-product-contract.md) — ops UI trust envelope  
 
 ### I am reviewing or judging a submission
@@ -65,7 +65,7 @@ If you change behavior, contracts, or env semantics, update the **build** doc fi
 | [`trust-invariants.md`](./trust-invariants.md) | Canonical `INV-*` list: guarantees, failure behavior, proof paths (tests + evidence) |
 | [`adapter-contracts.md`](./adapter-contracts.md) | Adapter stability expectations and extension hooks |
 | [`policy-dsl.md`](./policy-dsl.md) | Policy language, validation, examples |
-| [`security-model.md`](./security-model.md) | Contract roles, fail-closed planning, keys, policy hash integrity, audit field classification |
+| [`security-model.md`](./security-model.md) | Threat overview ↔ mitigations ↔ `INV-*`, contract roles, fail-closed planning, keys, policy hash integrity, audit field classification |
 | [`versioning-policy.md`](./versioning-policy.md) | Version and compatibility notes |
 | [`triple-verified.md`](./triple-verified.md) | Cross-check narrative where applicable |
 
@@ -75,7 +75,7 @@ If you change behavior, contracts, or env semantics, update the **build** doc fi
 
 | Document | What you will find |
 | --- | --- |
-| [`operations.md`](./operations.md) | Emergency pause, key rotation, reconciliation alerts, env validation, preflight |
+| [`operations.md`](./operations.md) | Day-one clone→green steps, emergency pause, key rotation, reconciliation, env validation, preflight command matrix |
 | [`deployments.md`](./deployments.md) | Chain IDs, deployed addresses, txs, `.env` mappings, policy URI guidance |
 | [`workspace-isolation.md`](./workspace-isolation.md) | Isolating workspaces and dependency trees |
 | [`zerog-storage-sdk-peer.md`](./zerog-storage-sdk-peer.md) | Why 0G storage SDK is optional at root; `ethers` peer interaction with Hardhat |
