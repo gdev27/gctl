@@ -1,19 +1,23 @@
 # Deploy the gctl HTTP indexer to Fly.io (remote build — no local Docker).
 #
-# One-time (GitHub repo → Settings → Secrets and variables → Actions):
-#   FLY_API_TOKEN   — from `fly tokens create` (https://fly.io/docs/flyctl/tokens-create/)
-#   FLY_INDEXER_APP — globally unique app name, e.g. gctl-indexer-yourname
+# One-time: GitHub → Settings → Secrets → Actions → add FLY_API_TOKEN
+#   Create token: fly auth login && fly tokens create   (https://fly.io/docs/flyctl/tokens-create/)
 #
-# Then: Actions → "Deploy gctl indexer (Fly.io)" → Run workflow.
-# Finally: Vercel → INDEXER_URL = https://<FLY_INDEXER_APP>.fly.dev (no trailing slash)
+# Then: Actions → "Deploy gctl indexer (Fly.io)" → Run workflow → enter a globally unique app name.
+# Finally: Vercel → INDEXER_URL = https://<that-app-name>.fly.dev
 
 name: Deploy gctl indexer (Fly.io)
 
 on:
   workflow_dispatch:
+    inputs:
+      fly_app:
+        description: Globally unique Fly app name (e.g. gctl-indexer-gdev27)
+        required: true
+        type: string
 
 concurrency:
-  group: deploy-indexer
+  group: deploy-indexer-${{ github.event.inputs.fly_app }}
   cancel-in-progress: true
 
 jobs:
@@ -24,40 +28,36 @@ jobs:
 
       - uses: superfly/flyctl-actions/setup-flyctl@master
 
-      - name: Validate secrets
+      - name: Validate token and app name
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-          FLY_INDEXER_APP: ${{ secrets.FLY_INDEXER_APP }}
+          FLY_INDEXER_APP: ${{ github.event.inputs.fly_app }}
         run: |
           set -e
           if [ -z "${FLY_API_TOKEN:-}" ]; then
-            echo "::error::Missing secret FLY_API_TOKEN. Create: fly auth login && fly tokens create"
-            exit 1
-          fi
-          if [ -z "${FLY_INDEXER_APP:-}" ]; then
-            echo "::error::Missing secret FLY_INDEXER_APP. Use a globally unique name (e.g. gctl-indexer-yourname)."
+            echo "::error::Add repo secret FLY_API_TOKEN. Run: fly auth login && fly tokens create"
             exit 1
           fi
           if ! echo "$FLY_INDEXER_APP" | grep -qE '^[a-z][a-z0-9-]{1,50}$'; then
-            echo "::error::FLY_INDEXER_APP must be lowercase letters, digits, hyphens; start with a letter."
+            echo "::error::App name must be lowercase letters, digits, hyphens; start with a letter."
             exit 1
           fi
 
       - name: Create Fly app if needed
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-          FLY_INDEXER_APP: ${{ secrets.FLY_INDEXER_APP }}
+          FLY_INDEXER_APP: ${{ github.event.inputs.fly_app }}
         run: flyctl apps create "$FLY_INDEXER_APP" 2>/dev/null || true
 
       - name: Deploy (remote build)
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-          FLY_INDEXER_APP: ${{ secrets.FLY_INDEXER_APP }}
+          FLY_INDEXER_APP: ${{ github.event.inputs.fly_app }}
         run: flyctl deploy --config fly.indexer.toml --remote-only --app "$FLY_INDEXER_APP"
 
       - name: Summary — set this on Vercel
         env:
-          FLY_INDEXER_APP: ${{ secrets.FLY_INDEXER_APP }}
+          FLY_INDEXER_APP: ${{ github.event.inputs.fly_app }}
         run: |
           URL="https://${FLY_INDEXER_APP}.fly.dev"
           {

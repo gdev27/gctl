@@ -31,23 +31,19 @@ Fly builds the image remotely.
 
 ### Option A — GitHub Actions (recommended)
 
-1. **Fly.io**: install [flyctl](https://fly.io/docs/hands-on/install-flyctl/) locally once, run `fly auth login`, then create a deploy token:
+1. **Fly.io** (one-time on your laptop): install [flyctl](https://fly.io/docs/hands-on/install-flyctl/), run `fly auth login`, then:
    ```bash
    fly tokens create
    ```
    Copy the token.
 
-2. **GitHub** (this repo → **Settings → Secrets and variables → Actions**):
-   - **`FLY_API_TOKEN`** — paste the token from step 1.
-   - **`FLY_INDEXER_APP`** — a **globally unique** app name (lowercase, hyphens), e.g. `gctl-indexer-yourname`.
+2. **GitHub** (repo → **Settings → Secrets and variables → Actions**): add **`FLY_API_TOKEN`** with that value.
 
-3. Push these workflow files to GitHub (merge to your default branch if required).
+3. **Actions** → **Deploy gctl indexer (Fly.io)** → **Run workflow** → type a **globally unique** app name (e.g. `gctl-indexer-gdev27`).
 
-4. **Actions** → **Deploy gctl indexer (Fly.io)** → **Run workflow**.
+4. **Vercel only** (your step): set **`INDEXER_URL`** = `https://<that-app-name>.fly.dev` (no trailing slash). Redeploy the Vercel project.
 
-5. **Vercel only** (your step): set **`INDEXER_URL`** = `https://<FLY_INDEXER_APP>.fly.dev` (no trailing slash). Redeploy the Vercel project.
-
-Health check: `https://<FLY_INDEXER_APP>.fly.dev/health`
+Health check: `https://<that-app-name>.fly.dev/health`
 
 ### Option B — Your machine (flyctl + login)
 
