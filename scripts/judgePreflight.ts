@@ -89,7 +89,7 @@ async function main(): Promise<void> {
     "## Step Results",
     ...results.map(
       (result) =>
-        `- ${result.success ? "[PASS]" : "[FAIL]"} \`${result.id}\` — \`${result.command}\` (exit=${result.exitCode}) -> \`${result.outputFile}\``
+        `- ${result.success ? "[PASS]" : "[FAIL]"} \`${result.id}\`: \`${result.command}\` (exit=${result.exitCode}) -> \`${result.outputFile}\``
     ),
     ""
   ].join("\n");

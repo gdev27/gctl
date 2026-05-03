@@ -1,6 +1,6 @@
 # Security Model
 
-This document describes **how gctl protects policy, identity, and execution**: onchain controls, client fail-closed behavior, key handling, and audit field classification. The **normative list of guarantees** (what must hold, how we fail, where it is tested) is [`trust-invariants.md`](./trust-invariants.md)—read that when you need invariant IDs for submissions or reviews.
+This document describes **how gctl protects policy, identity, and execution**: onchain controls, client fail-closed behavior, key handling, and audit field classification. The **normative list of guarantees** (what must hold, how we fail, where it is tested) is [`trust-invariants.md`](./trust-invariants.md); read that when you need invariant IDs for submissions or reviews.
 
 ---
 
@@ -82,10 +82,10 @@ Operational steps also appear in [`operations.md`](./operations.md) (key rotatio
 
 ## Further reading
 
-- [`trust-invariants.md`](./trust-invariants.md) — canonical `INV-*` list and proof paths  
-- [`architecture.md`](./architecture.md) — trust boundaries diagram  
-- [`operations.md`](./operations.md) — env validation, preflight, pause drill  
-- [`adapter-contracts.md`](./adapter-contracts.md) — extension surfaces and stability expectations  
+- [`trust-invariants.md`](./trust-invariants.md): canonical `INV-*` list and proof paths  
+- [`architecture.md`](./architecture.md): trust boundaries diagram  
+- [`operations.md`](./operations.md): env validation, preflight, pause drill  
+- [`adapter-contracts.md`](./adapter-contracts.md): extension surfaces and stability expectations  
 
 ---
 

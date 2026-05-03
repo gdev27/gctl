@@ -28,7 +28,7 @@ The Vercel Functions in `api/ops/*` and `api/functions/debate-policy.js` only ru
 
 ## Live ops dashboard (Vercel + indexer)
 
-Ship the indexer with Docker and optional Fly.io — see **`indexer/README.md`** (includes `npm run indexer:docker:build`, `fly deploy --config fly.indexer.toml`, and wiring **`INDEXER_URL`** + **`FUND_ENS_NAME`** on Vercel).
+Ship the indexer with Docker and optional Fly.io. See **`indexer/README.md`** (includes `npm run indexer:docker:build`, `fly deploy --config fly.indexer.toml`, and wiring **`INDEXER_URL`** + **`FUND_ENS_NAME`** on Vercel).
 
 Populate the indexer’s backing store using your normal pipeline (demos, ingestion, etc.); empty responses still return live HTTP with empty arrays, while the Vercel layer may merge mock fallbacks when needed.
 

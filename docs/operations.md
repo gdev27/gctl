@@ -8,7 +8,7 @@ Canonical invariant IDs referenced below live in [`trust-invariants.md`](./trust
 
 ## Day one: from clone to a green preflight
 
-Use this path the first time you touch the repo—or after pulling a large change.
+Use this path the first time you touch the repo, or after pulling a large change.
 
 1. **Install and env**
    - `npm install`
@@ -16,15 +16,15 @@ Use this path the first time you touch the repo—or after pulling a large chang
    - For the web app: `cp web/.env.example web/.env` if you run the Vite console; keep **secrets out of `VITE_*`** ([`INV-ENV-001`](./trust-invariants.md)).
 
 2. **Prove the contract**
-   - `npm run validate:env` — fails fast if browser/server env boundaries are wrong.
-   - `npm run verify` — Hardhat compile, Vitest, typecheck, env + evidence schema ([`INV-ENV-001`](./trust-invariants.md), evidence validation).
+   - `npm run validate:env`: fails fast if browser/server env boundaries are wrong.
+   - `npm run verify`: Hardhat compile, Vitest, typecheck, env + evidence schema ([`INV-ENV-001`](./trust-invariants.md), evidence validation).
 
 3. **Submission-style gate (optional but recommended before demos or PRs)**
-   - `npm run judge:preflight` — same family of checks plus captured outputs under [`docs/evidence/preflight/`](./evidence/preflight/) and [`docs/evidence/judge-preflight-report.md`](./evidence/judge-preflight-report.md).
+   - `npm run judge:preflight`: same family of checks plus captured outputs under [`docs/evidence/preflight/`](./evidence/preflight/) and [`docs/evidence/judge-preflight-report.md`](./evidence/judge-preflight-report.md).
 
 4. **Operator UI (optional)**
    - `npm ci --prefix web` then `npm run web:dev`
-   - Remember: same-origin `/api/*` is **production-shaped on Vercel**; locally the SPA may show **fallback** trust envelopes—read [`frontend-product-contract.md`](./frontend-product-contract.md) and [`INV-SOURCE-001`](./trust-invariants.md).
+   - Remember: same-origin `/api/*` is **production-shaped on Vercel**; locally the SPA may show **fallback** trust envelopes. Read [`frontend-product-contract.md`](./frontend-product-contract.md) and [`INV-SOURCE-001`](./trust-invariants.md).
 
 5. **If something fails**
    - Planning denies with explicit codes → see **Fail-closed guarantees** in [`security-model.md`](./security-model.md) and [`INV-FAILCLOSED-001`](./trust-invariants.md).

@@ -51,10 +51,10 @@ The gctl frontend is the consumer-facing control plane for policy-constrained au
 - Pages must display `SourceBadge` and `FallbackBanner` whenever `trustStatus !== healthy`; `source=fallback` is the strongest form of that non-healthy state.
 
 ## Visual system contract
-- **Aesthetic direction:** calm institutional cockpit. The brand voice is "policy-constrained autonomy you can prove" — confident, never decorative.
+- **Aesthetic direction:** calm institutional cockpit. The brand voice is "policy-constrained autonomy you can prove": confident, never decorative.
 - **Foundation:** Vite 6 + React 18 SPA in `web/` with Tailwind v3 (`web/tailwind.config.js`, HSL CSS-variable tokens declared in `web/src/index.css`) and shadcn/ui (New York, slate base) primitives in `web/src/components/ui/*`. The `cn` helper in `web/src/lib/utils.js` is the single class composer.
 - **Brand assets:** `web/src/components/site/GctlMark.jsx` ships an inline-SVG mark that adapts via `currentColor`. No raster brand assets in components.
-- **Color tokens (semantic, both themes):** the standard shadcn HSL palette — `background`, `foreground`, `card`, `popover`, `primary`, `secondary`, `muted`, `accent`, `destructive`, `border`, `input`, `ring`, plus `chart-1..5`. Tokens live in `web/src/index.css`. No hardcoded hex/rgba colors are allowed in components.
+- **Color tokens (semantic, both themes):** the standard shadcn HSL palette (`background`, `foreground`, `card`, `popover`, `primary`, `secondary`, `muted`, `accent`, `destructive`, `border`, `input`, `ring`, plus `chart-1..5`). Tokens live in `web/src/index.css`. No hardcoded hex/rgba colors are allowed in components.
 - **Type & spacing:** the bundled `font-sans` + `font-serif` (system-derived) and `font-mono` for hashes/IDs. Spacing follows Tailwind's default 4px scale.
 - **Iconography & charts:** `lucide-react` is the canonical icon set; trust badges live in `web/src/components/trust/SourceBadge.jsx` + `FallbackBanner.jsx`. Trends use Recharts.
 - **Information architecture:** `/`, `/docs`, and `/concepts` are the public marketing site; everything operator-facing lives under `/dashboard`, `/policy-builder`, `/playground`, `/swarm`, `/alerting`, `/explorer`, `/team`, and `/onboarding`, all wrapped by `AppLayout`.

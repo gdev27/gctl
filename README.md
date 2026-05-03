@@ -2,7 +2,7 @@
 
 **Policy-constrained autonomous agents for accountable onchain execution.**
 
-gctl is an open-source framework and reference implementation: deterministic policy evaluation, verifiable identity (ENS), reliability-aware routing (KeeperHub), and optional 0G compute, storage, and attestation surfaces—wired so an agent can **explain** why it acted, **prove** which constraints applied, and **fail closed** when trust dependencies are missing or untrusted.
+gctl is an open-source framework and reference implementation: deterministic policy evaluation, verifiable identity (ENS), reliability-aware routing (KeeperHub), and optional 0G compute, storage, and attestation surfaces, wired so an agent can **explain** why it acted, **prove** which constraints applied, and **fail closed** when trust dependencies are missing or untrusted.
 
 Built by [Gaurav Dev](https://x.com/gdev27).
 
@@ -39,21 +39,21 @@ Most agent demos can *propose* an action. Production systems that move value nee
 | Fire-and-forget txs | **KeeperHub workflows**: policy-derived branches (`safe`, `escalated`, `blocked`), retries, reconciliation, and auditable run records. |
 | Opaque infrastructure | **Explicit trust envelopes** in ops APIs and the UI (`live` vs `fallback`, `trustStatus`, recovery hints) so operators never confuse synthetic snapshots with live telemetry. |
 
-The invariant: **if identity, policy integrity, evidence, or execution dependencies cannot be trusted, gctl denies or degrades explicitly**—it does not silently pretend the path is healthy.
+The invariant: **if identity, policy integrity, evidence, or execution dependencies cannot be trusted, gctl denies or degrades explicitly**; it does not silently pretend the path is healthy.
 
 ---
 
 ## Design in four pillars
 
-1. **Policy (the law)** — YAML-style policy DSL, compiler, and `policy-engine` evaluator. Onchain `PolicyRegistry` anchors canonical policy hashes. See [`docs/policy-dsl.md`](docs/policy-dsl.md) and [`docs/architecture.md`](docs/architecture.md).
+1. **Policy (the law):** YAML-style policy DSL, compiler, and `policy-engine` evaluator. Onchain `PolicyRegistry` anchors canonical policy hashes. See [`docs/policy-dsl.md`](docs/policy-dsl.md) and [`docs/architecture.md`](docs/architecture.md).
 
-2. **Identity (who may act)** — ENS resolution, role/subname metadata, identity passport generation, and reverse verification on the critical planning path. See [`docs/trust-invariants.md`](docs/trust-invariants.md) (`INV-ENS-*`).
+2. **Identity (who may act):** ENS resolution, role/subname metadata, identity passport generation, and reverse verification on the critical planning path. See [`docs/trust-invariants.md`](docs/trust-invariants.md) (`INV-ENS-*`).
 
-3. **Execution (how value moves)** — KeeperHub routing, execution, reconciliation, encrypted audit fields, and analytics-shaped summaries. See [`keeperhub-workflows/`](keeperhub-workflows/) and [`docs/operations.md`](docs/operations.md).
+3. **Execution (how value moves):** KeeperHub routing, execution, reconciliation, encrypted audit fields, and analytics-shaped summaries. See [`keeperhub-workflows/`](keeperhub-workflows/) and [`docs/operations.md`](docs/operations.md).
 
-4. **Evidence (how you prove it)** — Schema-validated trust artifacts, judge preflight outputs, and deterministic demo JSON under [`docs/evidence/`](docs/evidence/). See [`docs/submission-pack.md`](docs/submission-pack.md).
+4. **Evidence (how you prove it):** Schema-validated trust artifacts, judge preflight outputs, and deterministic demo JSON under [`docs/evidence/`](docs/evidence/). See [`docs/submission-pack.md`](docs/submission-pack.md).
 
-Optional **0G** adapters add compute preflight, encrypted-at-rest memory, storage-backed policy URIs, and simulated or onchain attestation mapping—without breaking the deterministic judging path. See [`docs/adapter-contracts.md`](docs/adapter-contracts.md) and [`docs/sponsor-mapping.md`](docs/sponsor-mapping.md).
+Optional **0G** adapters add compute preflight, encrypted-at-rest memory, storage-backed policy URIs, and simulated or onchain attestation mapping, without breaking the deterministic judging path. See [`docs/adapter-contracts.md`](docs/adapter-contracts.md) and [`docs/sponsor-mapping.md`](docs/sponsor-mapping.md).
 
 ---
 
@@ -64,7 +64,7 @@ Think of it as a **pipeline with veto points**, not a single LLM call:
 1. An operator or autonomous **objective** enters the system (CLI, SDK, or swarm).
 2. **Planner** and **researcher** shape a policy-aware proposal; **critic** can veto unsafe paths.
 3. **Policy engine** evaluates deterministic constraints against the loaded graph (integrity-checked).
-4. **ENS** checks resolve role metadata; **reverse verification** applies when a caller ENS name is in play—see trust invariants.
+4. **ENS** checks resolve role metadata; **reverse verification** applies when a caller ENS name is in play (see trust invariants).
 5. **0G adapters** (when configured) handle compute preflight, memory artifacts, optional SDK storage, and attestation receipts (`simulated` vs `onchain`).
 6. **KeeperHub** runs approved actions on the right workflow branch and records evidence through reconciliation.
 
@@ -154,7 +154,7 @@ npm run web:typecheck
 npm run web:build
 ```
 
-**Idempotency note:** If `npm run compile:policy` or `npm run demo:init` is run against an already-initialized deployed `PolicyRegistry`, the registry may return `policy_exists`. That is an **idempotency** signal for setup flows—not the same as the repeatable judge path. For repeatable evaluation prefer `npm run judge:preflight`, `npm run demo:deterministic`, and `npm run demo:swarm`.
+**Idempotency note:** If `npm run compile:policy` or `npm run demo:init` is run against an already-initialized deployed `PolicyRegistry`, the registry may return `policy_exists`. That is an **idempotency** signal for setup flows, not the same as the repeatable judge path. For repeatable evaluation prefer `npm run judge:preflight`, `npm run demo:deterministic`, and `npm run demo:swarm`.
 
 ---
 
@@ -166,8 +166,8 @@ npm run demo:swarm
 npm run ens:passport
 ```
 
-- **Deterministic demo** — safe, escalated, and blocked policy branches in [`docs/evidence/demo-deterministic.json`](docs/evidence/demo-deterministic.json).
-- **Swarm demo** — planner, researcher, critic, and executor traces in [`docs/evidence/demo-swarm.json`](docs/evidence/demo-swarm.json).
+- **Deterministic demo:** safe, escalated, and blocked policy branches in [`docs/evidence/demo-deterministic.json`](docs/evidence/demo-deterministic.json).
+- **Swarm demo:** planner, researcher, critic, and executor traces in [`docs/evidence/demo-swarm.json`](docs/evidence/demo-swarm.json).
 - Step-by-step narrative: [`docs/demo-flows.md`](docs/demo-flows.md).
 
 ---
@@ -219,9 +219,9 @@ The **documentation hub** is [`docs/README.md`](docs/README.md): curated reading
 
 ## Sponsor alignment
 
-- **0G (framework, agents, storage, compute, chain)** — adapter-based surfaces with deterministic fallbacks and optional live SDK paths.
-- **ENS (identity + creative use)** — passports, roles, authorization, reverse verification, execution-profile routing.
-- **KeeperHub (execution + reliability)** — policy-derived branches, retries, run logs, reconciliation, analytics.
+- **0G (framework, agents, storage, compute, chain):** adapter-based surfaces with deterministic fallbacks and optional live SDK paths.
+- **ENS (identity + creative use):** passports, roles, authorization, reverse verification, execution-profile routing.
+- **KeeperHub (execution + reliability):** policy-derived branches, retries, run logs, reconciliation, analytics.
 
 Full traceability to files and judging criteria: **[`docs/sponsor-mapping.md`](docs/sponsor-mapping.md)**.
 
@@ -229,8 +229,8 @@ Full traceability to files and judging criteria: **[`docs/sponsor-mapping.md`](d
 
 ## Environment boundaries
 
-- **Root** [`.env.example`](.env.example) — server, chain, ENS, KeeperHub, 0G, and agent signer variables.
-- **`web/.env.example`** — browser boundary: only **`VITE_*`** keys ship to the client bundle.
+- **Root** [`.env.example`](.env.example): server, chain, ENS, KeeperHub, 0G, and agent signer variables.
+- **`web/.env.example`:** browser boundary: only **`VITE_*`** keys ship to the client bundle.
 
 **Never** put secrets, private keys, API keys, JWTs, or server-only endpoints in `VITE_*`. Env contract validation is part of `npm run validate:env` and the judge preflight.
 
@@ -238,8 +238,8 @@ Full traceability to files and judging criteria: **[`docs/sponsor-mapping.md`](d
 
 ## Contributing
 
-See **[`CONTRIBUTING.md`](CONTRIBUTING.md)** — development setup, fail-closed expectations, adapter extension rules, RFC location (`docs/rfcs/`), and PR verification (`npm run verify`).
+See **[`CONTRIBUTING.md`](CONTRIBUTING.md)** for development setup, fail-closed expectations, adapter extension rules, RFC location (`docs/rfcs/`), and PR verification (`npm run verify`).
 
 ---
 
-*gctl — policy first, identity verified, execution observable.*
+*gctl: policy first, identity verified, execution observable.*

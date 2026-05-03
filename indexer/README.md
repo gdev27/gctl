@@ -27,7 +27,7 @@ Snapshots use `indexer/index-state.json` by default, or **`INDEXER_STATE_PATH`**
 
 ## Deploy on Render (free tier, no Fly billing)
 
-Use this if you want a **real `INDEXER_URL`** without Fly. Tradeoffs: **cold starts** after idle, **free tier limits** — fine for demos.
+Use this if you want a **real `INDEXER_URL`** without Fly. Tradeoffs: **cold starts** after idle, **free tier limits**; fine for demos.
 
 ### Dashboard (what to change on the “Configure” screen)
 
@@ -53,7 +53,7 @@ Repo root **`render.yaml`** defines the same Docker web service; you can apply i
 
 Fly builds the image remotely.
 
-### Option A — GitHub Actions (recommended)
+### Option A: GitHub Actions (recommended)
 
 1. **Fly.io** (one-time on your laptop): install [flyctl](https://fly.io/docs/hands-on/install-flyctl/), run `fly auth login`, then create an **org** deploy token (CI must create apps; `fly tokens create deploy` without `-a` needs an existing app and fails with “Could not find App”):
    ```bash
@@ -70,7 +70,7 @@ Fly builds the image remotely.
 
 Health check: `https://<that-app-name>.fly.dev/health`
 
-### Option B — Your machine (flyctl + login)
+### Option B: Your machine (flyctl + login)
 
 From repo root:
 
@@ -85,7 +85,7 @@ Windows (PowerShell):
 .\scripts\deploy-indexer.ps1 -AppName YOUR_UNIQUE_APP_NAME
 ```
 
-### Option C — Docker on your machine
+### Option C: Docker on your machine
 
 ```bash
 npm run indexer:docker:build

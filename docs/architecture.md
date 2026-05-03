@@ -2,7 +2,7 @@
 
 This document is the **single-page mental model** for gctl: who touches policy, where identity is enforced, how execution leaves the building, and which trust boundaries are non-negotiable. Read it top-to-bottom once, then keep [`trust-invariants.md`](./trust-invariants.md) open beside it for the formal `INV-*` contracts.
 
-**In one sentence:** policy is compiled and anchored, the client is fail-closed, ENS establishes accountable roles, KeeperHub carries approved work to terminal states, and 0G adapters add compute, durable memory, and explicit attestation receipts—without collapsing those concerns into “one more API call.”
+**In one sentence:** policy is compiled and anchored, the client is fail-closed, ENS establishes accountable roles, KeeperHub carries approved work to terminal states, and 0G adapters add compute, durable memory, and explicit attestation receipts, without collapsing those concerns into “one more API call.”
 
 ```mermaid
 flowchart LR

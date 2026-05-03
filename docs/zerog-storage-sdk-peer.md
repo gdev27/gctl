@@ -27,8 +27,8 @@ Patching `node_modules/@0gfoundation/0g-storage-ts-sdk/package.json` after insta
 
 ## Manual legacy smoke (optional)
 
-After a **coherent** local install that includes `@0gfoundation/0g-storage-ts-sdk` (for example on a throwaway branch or after verifying `node_modules` still contains Hardhat), you can run [test/zeroGStorageSdkCompatibility.test.ts](../test/zeroGStorageSdkCompatibility.test.ts) with `GCTL_ZEROG_SDK_MANUAL_SMOKE=1` — see [zerog-storage-operators.md](./zerog-storage-operators.md).
+After a **coherent** local install that includes `@0gfoundation/0g-storage-ts-sdk` (for example on a throwaway branch or after verifying `node_modules` still contains Hardhat), you can run [test/zeroGStorageSdkCompatibility.test.ts](../test/zeroGStorageSdkCompatibility.test.ts) with `GCTL_ZEROG_SDK_MANUAL_SMOKE=1`. See [zerog-storage-operators.md](./zerog-storage-operators.md).
 
 ## See also
 
-- [workspace-isolation.md](./workspace-isolation.md) — optional future split of Hardhat vs agent/0G runtime installs.
+- [workspace-isolation.md](./workspace-isolation.md): optional future split of Hardhat vs agent/0G runtime installs.

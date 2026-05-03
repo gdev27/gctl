@@ -2,7 +2,7 @@
 
 - **When:** 2026-05-03
 - **Runner:** `node scripts/ui-sweep-prod.mjs` (Playwright Chromium)
-- **Result:** PASS — all listed routes loaded; no hard navigation failures; no unfiltered console errors after excluding known CSP/font and Radix dialog a11y dev warnings.
+- **Result:** PASS; all listed routes loaded; no hard navigation failures; no unfiltered console errors after excluding known CSP/font and Radix dialog a11y dev warnings.
 
 ## Routes exercised
 
